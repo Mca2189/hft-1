@@ -45,6 +45,9 @@ simdata:
 backtest:
 	$(WAF) configure backtest $(PARAMS)
 
+backtestpr:
+	$(WAF) configure backtestpr $(PARAMS)
+
 order_matcher:
 	$(WAF) configure order_matcher $(PARAMS)
 

@@ -352,6 +352,7 @@ void Strategy::Flatting() {
 
 bool Strategy::NewHigh(OrderSide::Enum side) {
   if (hedge_bid.size() < 6) {
+    printf("no enough data in deque\n");
     return true;
   }
   if (side == OrderSide::Buy) {  // main side buy, hedgeside sell, should be bid
