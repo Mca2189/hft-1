@@ -51,6 +51,7 @@ bool Strategy::FillStratConfig(const libconfig::Setting& param_setting) {
     }
     main_ticker = v[1];
     hedge_ticker = v[0];
+    printf("main:%s hedge:%s\n", main_ticker.c_str(), hedge_ticker.c_str());
     max_pos = param_setting["max_position"];
     train_samples_ = param_setting["train_samples"];
     double m_r = param_setting["min_range"];
@@ -132,10 +133,10 @@ void Strategy::CalParams() {
   FeePoint main_point = m_cw->CalFeePoint(main_ticker, GetMid(main_ticker), 1, GetMid(main_ticker), 1, no_close_today);
   FeePoint hedge_point = m_cw->CalFeePoint(hedge_ticker, GetMid(hedge_ticker), 1, GetMid(hedge_ticker), 1, no_close_today);
   double round_fee_cost = main_point.open_fee_point + main_point.close_fee_point + hedge_point.open_fee_point + hedge_point.close_fee_point;
-  // double long_width = std::max(range_width * long_std, min_range) + round_fee_cost;
-  // double short_width = std::max(range_width * short_std, min_range) + round_fee_cost;
-  double long_width = range_width * long_std + round_fee_cost;
-  double short_width = range_width * short_std + round_fee_cost;
+  double long_width = std::max(range_width * long_std, min_range) + round_fee_cost;
+  double short_width = std::max(range_width * short_std, min_range) + round_fee_cost;
+  // double long_width = range_width * long_std + round_fee_cost;
+  // double short_width = range_width * short_std + round_fee_cost;
   long_up_ = long_mean_ + long_width;
   long_down_ = long_mean_ - long_width;
   short_up_ = short_mean_ + short_width;
@@ -217,6 +218,7 @@ bool Strategy::OpenLogic() {
   double long_back = long_.back();
   double short_back = short_.back();
   if (abs(position_map[main_ticker]) >= max_pos || (long_back > short_down_ && short_back < long_up_)) {
+    // printf("[%s %s] no chance, long_back=%lf, shot_down=%lf, short_back=%lf, long_up=%lf\n", main_ticker.c_str(), hedge_ticker.c_str(), long_back, short_down_, short_back, long_up_);
     return false;
   }
   OrderSide::Enum side = (long_back <= short_down_) ? OrderSide::Buy : OrderSide::Sell;
@@ -228,7 +230,7 @@ bool Strategy::OpenLogic() {
 }
 
 bool Strategy::RiskCheck() {
-  return IsAlign() && close_round < max_round;  // && Spread_Good();
+  return IsAlign() && close_round < max_round && Spread_Good();
 }
 
 void Strategy::Run() {
@@ -250,16 +252,14 @@ void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
   if (IsAlign() && Spread_Good()) {
     double long_price = shot_map[main_ticker].asks[0] - shot_map[hedge_ticker].bids[0];
     double short_price = shot_map[main_ticker].bids[0] - shot_map[hedge_ticker].asks[0];
-    // printf("long_short diff is %lf\n", long_price - short_price);
     long_.push_back(long_price);
     short_.push_back(short_price);
-    // printf("long is %lf, short is %lf\n", long_price, short_price);
-    printf("[%s %s]long is %lf, short is %lf: long_up:%lf %lf %lf short:%lf %lf %lf\n", main_ticker.c_str(),
-           hedge_ticker.c_str(), long_price, short_price, long_up_, long_mean_, long_down_, short_up_,
-           short_mean_, short_down_);
+    // printf("[%s %s]long is %lf, short is %lf: long_up:%lf %lf %lf short:%lf %lf %lf\n", main_ticker.c_str(),
+           // hedge_ticker.c_str(), long_price, short_price, long_up_, long_mean_, long_down_, short_up_,
+           // short_mean_, short_down_);
     sample_tail++;
     int num_samples = sample_tail - sample_head;
-    if (num_samples >= train_samples_) {
+    if (num_samples > train_samples_) {
       CalParams();
     }
     if (ss == StrategyStatus::Training) {
