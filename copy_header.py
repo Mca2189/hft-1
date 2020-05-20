@@ -23,11 +23,15 @@ def Copy():
   header_path = 'lib-hft/include/'
   target_path = 'external/common/include/'
   for dl in dir_list:
+    if not os.path.exists(header_path+dl):
+      continue
     for f in os.listdir(header_path+dl):
       if f.split('.')[-1] == 'h' or f.split('.')[-1] == 'hpp':
         print('copying %s from %s to %s' % (f, header_path+dl, target_path+dl))
         command = 'cp -rf %s %s' % (header_path+dl+"/"+f, target_path+dl)
         os.system(command)
+  if not os.path.exists(header_path):
+    return
   for f in os.listdir(header_path):
     if f.split('.')[-1] != 'h' and f.split('.')[-1] != 'hpp':
       continue
