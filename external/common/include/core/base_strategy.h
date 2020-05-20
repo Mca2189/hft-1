@@ -45,17 +45,15 @@ class BaseStrategy {
   virtual void Clear();
   void debug() const;
   double GetMid(const std::string & ticker);
-  // void UpdateCT(const HistoryWorker& ct);
   virtual void UpdateTicker();
   virtual void HandleCommand(const Command& shot);
  protected:
-  // void RegisterTicker(const std::vector<std::string> & tickers);
-  // BaseStrategy(const std::string& contract_config_path);
   void UpdateAvgCost(const std::string & ticker, double trade_price, int size);
   std::string GenUniqueId();
   Order* NewOrder(const std::string & ticker, OrderSide::Enum side, int size, bool control_price, bool sleep_order, const std::string & tbd, bool no_today = false);
   Order* PlaceOrder(const std::string & ticker, double price, int size, bool no_today = false, const std::string & orderinfo = "");
   void ModOrder(Order* o, bool sleep=false);
+  void ReplaceOrder(Order* o);
   void CancelAll(const std::string & ticker);
   void CancelAll();
   void CancelOrder(Order* o);

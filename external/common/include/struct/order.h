@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <cstdint>
+#include <cmath>
 #include <sys/time.h>
 #include <fstream>
 
@@ -18,13 +20,15 @@ struct Order {
   timeval send_time;
   char ticker[MAX_CONTRACT_LENGTH];
   double price;
-  int size;
-  int traded_size;
+  int32_t size;
+  int32_t traded_size;
   OrderSide::Enum side;
   char order_ref[MAX_ORDERREF_SIZE];
   OrderAction::Enum action;
   OrderStatus::Enum status;
   Offset::Enum offset;
+  double target_price;
+  double shot_latency;
   char tbd[96];
   char exchange[32];
 
@@ -33,7 +37,9 @@ struct Order {
       price(0.0),
       size(0),
       traded_size(0),
-      offset(Offset::UNINITED) {
+      offset(Offset::UNINITED),
+      target_price(0.0),
+      shot_latency(0.0) {
     snprintf(ticker, sizeof(ticker), "%s", "");
     snprintf(order_ref, sizeof(order_ref), "%s", "");
     snprintf(tbd, sizeof(tbd), "%s", "");
@@ -58,7 +64,7 @@ struct Order {
     char send_time_s[32];
     snprintf(send_time_s, sizeof(send_time_s), "%ld.%ld", send_time.tv_sec, send_time.tv_usec);
     double send_time_sec = atof(send_time_s);
-    fprintf(stream, "%lf,%lf,%s,%lf,%d,%d,%s,%s,%s,%s,%s,%s,%s\n",shot_time_sec,send_time_sec,ticker,price,size,traded_size,OrderSide::ToString(side),order_ref,OrderAction::ToString(action),OrderStatus::ToString(status),Offset::ToString(offset),exchange,tbd);
+    fprintf(stream, "%lf,%lf,%s,%lf,%d,%d,%s,%s,%s,%s,%s,%.2f,%lf,%s,%s\n",shot_time_sec,send_time_sec,ticker,price,size,traded_size,OrderSide::ToString(side),order_ref,OrderAction::ToString(action),OrderStatus::ToString(status),Offset::ToString(offset), shot_latency, target_price, exchange, tbd);
   }
 
   void Show(std::ostream& stream) const {
@@ -67,6 +73,7 @@ struct Order {
     stream << "Order " << ticker << " " << price << "@" << size << " ";
     stream << traded_size << " " << OrderSide::ToString(side) << " " << order_ref << " ";
     stream << OrderAction::ToString(action) << " " << OrderStatus::ToString(status) << " ";
+    stream << shot_latency << " " << target_price << " ";
     stream << Offset::ToString(offset) << " " << exchange << " " << tbd << std::endl;
   }
 
@@ -76,7 +83,7 @@ struct Order {
     fprintf(stream, "%ld %04ld %ld %04ld Order %s |",
             send_time.tv_sec, send_time.tv_usec, shot_time.tv_sec, shot_time.tv_usec, ticker);
 
-      fprintf(stream, " %lf@%d %d %s %s %s %s %s %s %s\n", price, size, traded_size, OrderSide::ToString(side), order_ref, OrderAction::ToString(action), OrderStatus::ToString(status), Offset::ToString(offset), exchange, tbd);
+      fprintf(stream, " %lf@%d %d %s %s %s %s %s %.2f %lf %s %s\n", price, size, traded_size, OrderSide::ToString(side), order_ref, OrderAction::ToString(action), OrderStatus::ToString(status), Offset::ToString(offset), shot_latency, target_price, exchange, tbd);
   }
 };
 

@@ -2,7 +2,10 @@
 export LD_LIBRARY_PATH=/usr/local/lib
 
 cd /today
-gzip data_binary.dat
+gzip future*.dat
+
+cd /root/huatai/build/
+gzip stock*.dat
 
 cd /today/log
 
