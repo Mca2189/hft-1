@@ -26,16 +26,16 @@ Strategy::~Strategy() {
 }
 
 void Strategy::RunningSetup(std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender) {
-  ui_sender = uisender;
-  order_sender = ordersender;
+  m_ui_sender = uisender;
+  m_order_sender = ordersender;
   (*ticker_strat_map)[main_ticker].emplace_back(this);
   (*ticker_strat_map)[hedge_ticker].emplace_back(this);
   (*ticker_strat_map)["positionend"].emplace_back(this);
   MarketSnapshot shot;
-  shot_map[main_ticker] = shot;
-  shot_map[hedge_ticker] = shot;
-  avgcost_map[main_ticker] = 0.0;
-  avgcost_map[hedge_ticker] = 0.0;
+  m_shot_map[main_ticker] = shot;
+  m_shot_map[hedge_ticker] = shot;
+  m_avgcost_map[main_ticker] = 0.0;
+  m_avgcost_map[hedge_ticker] = 0.0;
 }
 
 bool Strategy::FillStratConfig(const libconfig::Setting& param_setting) {
@@ -65,7 +65,7 @@ bool Strategy::FillStratConfig(const libconfig::Setting& param_setting) {
     spread_threshold = spread_threshold_int*min_price_move;
     stop_loss_margin = param_setting["stop_loss_margin"];
     max_loss_times = param_setting["max_loss_times"];
-    max_holding_sec = param_setting["max_holding_sec"];
+    m_max_holding_sec = param_setting["max_holding_sec"];
     range_width = param_setting["range_width"];
     std::string con = GetCon(main_ticker);
     cancel_limit = contract_setting["cancel_limit"];
@@ -89,33 +89,33 @@ bool Strategy::FillStratConfig(const libconfig::Setting& param_setting) {
 
 void Strategy::Stop() {
   CancelAll(main_ticker);
-  ss = StrategyStatus::Stopped;
+  m_ss = StrategyStatus::Stopped;
 }
 
 bool Strategy::IsAlign() {
-  return shot_map[main_ticker].time.tv_sec == shot_map[hedge_ticker].time.tv_sec && abs(shot_map[main_ticker].time.tv_usec-shot_map[hedge_ticker].time.tv_usec) < 100000;
+  return m_shot_map[main_ticker].time.tv_sec == m_shot_map[hedge_ticker].time.tv_sec && abs(m_shot_map[main_ticker].time.tv_usec-m_shot_map[hedge_ticker].time.tv_usec) < 100000;
 }
 
 
 void Strategy::DoOperationAfterCancelled(Order* o) {
-  if (cancel_map[o->ticker] > cancel_limit) {
+  if (m_cancel_map[o->ticker] > cancel_limit) {
     printf("ticker %s hit cancel limit!\n", o->ticker);
     Stop();
   }
 }
 
 double Strategy::OrderPrice(const std::string & ticker, OrderSide::Enum side, bool control_price) {
-  if (mode_ == StrategyMode::NextTest) {
+  if (m_mode == StrategyMode::NextTest) {
     if (ticker == hedge_ticker) {
-      return (side == OrderSide::Buy)?next_shot_map[ticker].asks[0]:next_shot_map[ticker].bids[0];
+      return (side == OrderSide::Buy)?m_next_shot_map[ticker].asks[0]:m_next_shot_map[ticker].bids[0];
     } else if (ticker == main_ticker) {
-      return (side == OrderSide::Buy)?shot_map[ticker].asks[0]:shot_map[ticker].bids[0];
+      return (side == OrderSide::Buy)?m_shot_map[ticker].asks[0]:m_shot_map[ticker].bids[0];
     } else {
       printf("error ticker %s\n", ticker.c_str());
       return -1.0;
     }
   } else {
-      return (side == OrderSide::Buy)?shot_map[ticker].asks[0]:shot_map[ticker].bids[0];
+      return (side == OrderSide::Buy)?m_shot_map[ticker].asks[0]:m_shot_map[ticker].bids[0];
   }
 }
 
@@ -144,11 +144,11 @@ void Strategy::CalParams() {
   sample_head = sample_tail;
   printf("[%s %s]cal done: long_up:%lf %lf %lf short:%lf %lf %lf\n", main_ticker.c_str(), hedge_ticker.c_str(),
          long_up_, long_mean_, long_down_, short_up_, short_mean_, short_down_);
-  shot_map[main_ticker].Show(stdout);
+  m_shot_map[main_ticker].Show(stdout);
 }
 
 void Strategy::ForceFlat() {
-  int pos = position_map[main_ticker];
+  int pos = m_position_map[main_ticker];
   if (pos == 0) {
     return;
   }
@@ -159,29 +159,29 @@ void Strategy::ForceFlat() {
     }
     if (i == max_close_try - 1) {
       printf("[%s %s]try max_close times, cant close this order!\n", main_ticker.c_str(), hedge_ticker.c_str());
-      PrintMap(order_map);
-      order_map.clear();  // it's a temp solution, TODO
+      PrintMap(m_order_map);
+      m_order_map.clear();  // it's a temp solution, TODO
       Close(side);
     }
   }
 }
 
 bool Strategy::Close(OrderSide::Enum side) {
-  if (!order_map.empty()) {
+  if (!m_order_map.empty()) {
     printf("[%s %s]block order exsited! no close\n", main_ticker.c_str(), hedge_ticker.c_str());
-    PrintMap(order_map);
+    PrintMap(m_order_map);
     return false;
   }
-  double price = (side == OrderSide::Buy) ? shot_map[main_ticker].asks[0] : shot_map[main_ticker].bids[0];
+  double price = (side == OrderSide::Buy) ? m_shot_map[main_ticker].asks[0] : m_shot_map[main_ticker].bids[0];
   int64_t size = (side == OrderSide::Buy) ? 1 : -1;
-  target_hedge_price = (side == OrderSide::Buy) ? shot_map[hedge_ticker].bids[0] : shot_map[hedge_ticker].asks[0];
+  target_hedge_price = (side == OrderSide::Buy) ? m_shot_map[hedge_ticker].bids[0] : m_shot_map[hedge_ticker].asks[0];
   Order* o = PlaceOrder(main_ticker, price, size, no_close_today, "close");
   o->Show(stdout);
   return true;
 }
 
 void Strategy::CloseLogic() {
-  int pos = position_map[main_ticker];
+  int pos = m_position_map[main_ticker];
   if (pos == 0) {
     return;
   }
@@ -202,22 +202,22 @@ void Strategy::Flatting() {
 }
 
 void Strategy::Open(OrderSide::Enum side) {
-  if (!order_map.empty()) {
+  if (!m_order_map.empty()) {
     printf("block order exsited! no open \n");
-    PrintMap(order_map);
+    PrintMap(m_order_map);
     return;
   }
-  double price = (side == OrderSide::Buy) ? shot_map[main_ticker].asks[0] : shot_map[main_ticker].bids[0];
+  double price = (side == OrderSide::Buy) ? m_shot_map[main_ticker].asks[0] : m_shot_map[main_ticker].bids[0];
   int64_t size = (side == OrderSide::Buy) ? 1 : -1;
   Order* o = PlaceOrder(main_ticker, price, size, no_close_today, "open");
-  target_hedge_price = (side == OrderSide::Buy) ? shot_map[hedge_ticker].bids[0] : shot_map[hedge_ticker].asks[0];
+  target_hedge_price = (side == OrderSide::Buy) ? m_shot_map[hedge_ticker].bids[0] : m_shot_map[hedge_ticker].asks[0];
   o->Show(stdout);
 }
 
 bool Strategy::OpenLogic() {
   double long_back = long_.back();
   double short_back = short_.back();
-  if (abs(position_map[main_ticker]) >= max_pos || (long_back > short_down_ && short_back < long_up_)) {
+  if (abs(m_position_map[main_ticker]) >= max_pos || (long_back > short_down_ && short_back < long_up_)) {
     // printf("[%s %s] no chance, long_back=%lf, shot_down=%lf, short_back=%lf, long_up=%lf\n", main_ticker.c_str(), hedge_ticker.c_str(), long_back, short_down_, short_back, long_up_);
     return false;
   }
@@ -241,17 +241,11 @@ void Strategy::Run() {
   }
 }
 
-void Strategy::Init() {
-  ticker_map[main_ticker] = true;
-  ticker_map[hedge_ticker] = true;
-  ticker_map["positionend"] = true;
-}
-
 void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
-  current_spread = shot_map[main_ticker].asks[0] - shot_map[main_ticker].bids[0] + shot_map[hedge_ticker].asks[0] - shot_map[hedge_ticker].bids[0];
+  current_spread = m_shot_map[main_ticker].asks[0] - m_shot_map[main_ticker].bids[0] + m_shot_map[hedge_ticker].asks[0] - m_shot_map[hedge_ticker].bids[0];
   if (IsAlign() && Spread_Good()) {
-    double long_price = shot_map[main_ticker].asks[0] - shot_map[hedge_ticker].bids[0];
-    double short_price = shot_map[main_ticker].bids[0] - shot_map[hedge_ticker].asks[0];
+    double long_price = m_shot_map[main_ticker].asks[0] - m_shot_map[hedge_ticker].bids[0];
+    double short_price = m_shot_map[main_ticker].bids[0] - m_shot_map[hedge_ticker].asks[0];
     long_.push_back(long_price);
     short_.push_back(short_price);
     // printf("[%s %s]long is %lf, short is %lf: long_up:%lf %lf %lf short:%lf %lf %lf\n", main_ticker.c_str(),
@@ -261,8 +255,6 @@ void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
     int num_samples = sample_tail - sample_head;
     if (num_samples > train_samples_) {
       CalParams();
-    }
-    if (ss == StrategyStatus::Training) {
     }
   }
 }
@@ -276,23 +268,23 @@ bool Strategy::Ready() {
 }
 
 void Strategy::ModerateOrders(const std::string & ticker) {
-  if (mode_ != StrategyMode::Real) {
+  if (m_mode != StrategyMode::Real) {
     return;
   }
-  for (auto m:order_map) {
+  for (auto m : m_order_map) {
     Order* o = m.second;
     if (!o->Valid()) {
       continue;
     }
-    MarketSnapshot shot = shot_map[o->ticker];
+    MarketSnapshot shot = m_shot_map[o->ticker];
     double reasonable_price = (o->side == OrderSide::Buy ? shot.asks[0] : shot.bids[0]);
     bool is_price_move = (fabs(reasonable_price - o->price) >= min_price_move/2);
     if (!is_price_move) {
       continue;
     }
     if (o->ticker == main_ticker) {
-      if ((o->side == OrderSide::Buy && shot_map[hedge_ticker].bids[0] - this->target_hedge_price < -1e-4) ||
-          (o->side == OrderSide::Sell && shot_map[hedge_ticker].asks[0] - this->target_hedge_price > -1e-4) ) {
+      if ((o->side == OrderSide::Buy && m_shot_map[hedge_ticker].bids[0] - this->target_hedge_price < -1e-4) ||
+          (o->side == OrderSide::Sell && m_shot_map[hedge_ticker].asks[0] - this->target_hedge_price > -1e-4) ) {
         CancelOrder(o);
       }
     } else if (o->ticker == hedge_ticker) {
@@ -314,9 +306,9 @@ void Strategy::DoOperationAfterFilled(Order* o, const ExchangeInfo& info) {
   std::string tbd = o->tbd;
   bool is_close = (tbd.find("close") != string::npos);
   if (strcmp(info.ticker, main_ticker.c_str()) == 0) {
-    double price = (info.side == OrderSide::Buy) ? shot_map[hedge_ticker].bids[0] : shot_map[hedge_ticker].asks[0];
-    if (mode_ == StrategyMode::NextTest) {
-      price = (info.side == OrderSide::Buy) ? next_shot_map[hedge_ticker].bids[0] : next_shot_map[hedge_ticker].asks[0];
+    double price = (info.side == OrderSide::Buy) ? m_shot_map[hedge_ticker].bids[0] : m_shot_map[hedge_ticker].asks[0];
+    if (m_mode == StrategyMode::NextTest) {
+      price = (info.side == OrderSide::Buy) ? m_next_shot_map[hedge_ticker].bids[0] : m_next_shot_map[hedge_ticker].asks[0];
     }
     int64_t size = (info.side == OrderSide::Buy) ? -1 : 1;
     string orderinfo = is_close ? "close" : "open";

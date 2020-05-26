@@ -32,11 +32,7 @@ class Strategy : public BaseStrategy {
   explicit Strategy(const libconfig::Setting & param_setting, std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender, TimeController* tc, ContractWorker* cw, const std::string & date, StrategyMode::Enum mode = StrategyMode::Real, std::ofstream* exchange_file = nullptr);
   ~Strategy();
 
-  void Start() override;
-  void Stop() override;
 
-  // void Clear() override;
-  // void UpdateTicker() override;
  private:
   bool FillStratConfig(const libconfig::Setting& param_setting);
   void RunningSetup(std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender);
@@ -47,7 +43,8 @@ class Strategy : public BaseStrategy {
   void DoOperationAfterCancelled(Order* o) override;
   void ModerateOrders(const std::string & contract) override;
 
-  void Init() override;
+  void Start() override;
+  void Stop() override;
   bool Ready() override;
   void Resume() override;
   void Run() override;

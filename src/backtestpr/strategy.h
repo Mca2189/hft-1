@@ -47,7 +47,6 @@ class Strategy : public BaseStrategy {
   void DoOperationAfterCancelled(Order* o) override;
   void ModerateOrders(const std::string & contract) override;
 
-  void Init() override;
   bool Ready() override;
   void Resume() override;
   void Run() override;

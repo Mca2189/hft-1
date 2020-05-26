@@ -249,14 +249,15 @@ int main() {
 
   Listener listener(
     user_api,
-    "0034",
+    "8060",
     "63056012",
     "wmby2020");
 
   user_api->RegisterSpi(&listener);
 
   // std::string front = "tcp://180.166.0.229:21413";  // fangzheng
-  std::string front = "tcp://180.168.146.187:10110";  // fangzheng
+  // std::string front = "tcp://180.168.146.187:10110";  // fangzheng
+  std::string front = "tcp://180.166.65.122:41213";  // wcs
   user_api->RegisterFront(const_cast<char*>(front.c_str()));
 
   user_api->Init();

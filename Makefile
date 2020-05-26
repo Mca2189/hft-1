@@ -33,6 +33,9 @@ simplemaker:
 simplearb:
 	$(WAF) configure simplearb $(PARAMS)
 
+simplearb2:
+	$(WAF) configure simplearb2 $(PARAMS)
+
 pairtrading:
 	$(WAF) configure pairtrading $(PARAMS)
 

@@ -19,17 +19,6 @@ void Strategy::Stop() {
   CancelAll();
 }
 
-void Strategy::Init() {
-  ticker_map[main_ticker] = true;
-  ticker_map[hedge_ticker] = true;
-  ticker_map["positionend"] = true;
-  std::vector<string> sleep_time_v;
-  std::vector<string> close_time_v;
-  std::vector<string> force_close_time_v;
-  m_tc = new TimeController("/root/hft/config/prod/time.config");
-  m_cw = new ContractWorker("/root/hft/config/contract/bk_contract.config");
-}
-
 bool Strategy::Ready() {
   return true;
 }
@@ -50,8 +39,8 @@ void Strategy::Flatting() {
 }
 
 void Strategy::DoOperationAfterCancelled(Order* o) {
-  printf("ticker %s cancel num %d!\n", o->ticker, cancel_map[o->ticker]);
-  if (cancel_map[o->ticker] > 100) {
+  printf("ticker %s cancel num %d!\n", o->ticker, m_cancel_map[o->ticker]);
+  if (m_cancel_map[o->ticker] > 100) {
     printf("ticker %s hit cancel limit!\n", o->ticker);
     Stop();
   }
@@ -59,7 +48,7 @@ void Strategy::DoOperationAfterCancelled(Order* o) {
 
 double Strategy::OrderPrice(const std::string & ticker, OrderSide::Enum side, bool control_price) {
   // this is a logic to make order use market price
-  return (side == OrderSide::Buy)?shot_map[ticker].asks[0]:shot_map[ticker].bids[0];
+  return (side == OrderSide::Buy)?m_shot_map[ticker].asks[0]:m_shot_map[ticker].bids[0];
 }
 
 void Strategy::Start() {
@@ -74,9 +63,9 @@ void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
 }
 
 void Strategy::ModerateOrders(const std::string & ticker) {
-  for (std::unordered_map<std::string, Order*>::iterator it = order_map.begin(); it != order_map.end(); it++) {
+  for (std::unordered_map<std::string, Order*>::iterator it = m_order_map.begin(); it != m_order_map.end(); it++) {
     Order* o = it->second;
-    MarketSnapshot shot = shot_map[o->ticker];
+    MarketSnapshot shot = m_shot_map[o->ticker];
     if (o->Valid()) {
       if (o->side == OrderSide::Buy && fabs(o->price - shot.asks[0]) > 0.01) {
         ModOrder(o);
