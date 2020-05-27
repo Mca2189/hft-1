@@ -106,7 +106,7 @@ std::unordered_map<std::string, std::vector<BaseStrategy*> > GetStratMap(std::st
   std::tie(data_sender, order_sender, f) = bt_config.GenSender(date);
   for (auto ticker : bt_config.strat_cw->GetTicker()) {
     const libconfig::Setting & p = bt_config.strat_cw->Lookup(ticker);
-    auto s = new Strategy(p, &ticker_strat_map, data_sender, order_sender, bt_config.tc, bt_config.cw, bt_config.GenHw(date), date, mode, f);
+    auto s = new Strategy(p, &ticker_strat_map, data_sender, order_sender, bt_config.tc, bt_config.cw, date, mode, f);
     s->Print();
   }
   return ticker_strat_map;

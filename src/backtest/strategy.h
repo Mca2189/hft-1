@@ -1,19 +1,6 @@
 #ifndef SRC_BACKTEST_STRATEGY_H_
 #define SRC_BACKTEST_STRATEGY_H_
 
-#include <struct/market_snapshot.h>
-#include <struct/strategy_status.h>
-#include <util/time_controller.h>
-#include <struct/order.h>
-#include <struct/command.h>
-#include <util/zmq_sender.hpp>
-#include <util/dater.h>
-#include <struct/exchange_info.h>
-#include <struct/order_status.h>
-#include <util/history_worker.h>
-#include <util/contract_worker.h>
-#include <util/common_tools.h>
-#include <core/base_strategy.h>
 #include <libconfig.h++>
 #include <unordered_map>
 
@@ -21,11 +8,28 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <deque>
 #include <memory>
+
+#include "struct/market_snapshot.h"
+#include "struct/strategy_status.h"
+#include "struct/strategy_mode.h"
+#include "struct/order.h"
+#include "struct/command.h"
+#include "struct/exchange_info.h"
+#include "struct/order_status.h"
+#include "util/time_controller.h"
+#include "util/zmq_sender.hpp"
+#include "util/dater.h"
+#include "util/history_worker.h"
+#include "util/contract_worker.h"
+#include "util/common_tools.h"
+#include "core/base_strategy.h"
 
 class Strategy : public BaseStrategy {
  public:
-  explicit Strategy(const libconfig::Setting & param_setting, std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender, TimeController* tc, ContractWorker* cw, const std::string & date, const std::string & mode = "real", std::ofstream* exchange_file = nullptr);
+  explicit Strategy(const libconfig::Setting & param_setting, std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender, TimeController* tc, ContractWorker* cw, HistoryWorker* hw, const std::string & date, StrategyMode::Enum mode = StrategyMode::Real, std::ofstream* exchange_file = nullptr);
+  // explicit Strategy(const libconfig::Setting & param_setting, std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender, TimeController* tc, ContractWorker* cw, const std::string & date, StrategyMode::Enum mode = StrategyMode::Real, std::ofstream* exchange_file = nullptr);
   ~Strategy();
 
   void Start() override;
@@ -36,7 +40,7 @@ class Strategy : public BaseStrategy {
   // void UpdateTicker() override;
  private:
   bool FillStratConfig(const libconfig::Setting& param_setting);
-  void RunningSetup(std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender, const std::string & mode);
+  void RunningSetup(std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender);
   void ClearPositionRecord();
   void DoOperationAfterUpdateData(const MarketSnapshot& shot) override;
   void DoOperationAfterUpdatePos(Order* o, const ExchangeInfo& info) override;
@@ -44,7 +48,6 @@ class Strategy : public BaseStrategy {
   void DoOperationAfterCancelled(Order* o) override;
   void ModerateOrders(const std::string & contract) override;
 
-  void Init() override;
   bool Ready() override;
   void Pause() override;
   void Resume() override;
@@ -81,6 +84,7 @@ class Strategy : public BaseStrategy {
   void UpdateBound(OrderSide::Enum side);
   void StopLossLogic();
   void HandleTestOrder(Order *o);
+  bool NewHigh(OrderSide::Enum side);
 
   char order_ref[MAX_ORDERREF_SIZE];
   std::string main_ticker;
@@ -98,10 +102,9 @@ class Strategy : public BaseStrategy {
   std::vector<double> map_vector;
   int current_pos;
   double min_profit;
-  int min_train_sample;
+  int train_samples;
   double min_range;
   double increment;
-  std::string mode;
   std::string date;
   double spread_threshold;
   int closed_size;
@@ -124,6 +127,9 @@ class Strategy : public BaseStrategy {
   int sample_head;
   int sample_tail;
   std::ofstream* exchange_file;
+  double target_hedge_price;
+  std::deque<double>  hedge_ask;
+  std::deque<double> hedge_bid;
 };
 
 #endif  // SRC_BACKTEST_STRATEGY_H_

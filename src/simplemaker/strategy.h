@@ -49,8 +49,6 @@ class Strategy : public BaseStrategy {
   void ModerateOrders(const std::string & contract, double edurance);
   // void ModerateOrders(const std::string & contract);
 
-  void Init();
-
   double CalBalancePrice();
 
   bool TradeClose(const std::string & contract, int size);

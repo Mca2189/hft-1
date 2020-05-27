@@ -33,6 +33,9 @@ simplemaker:
 simplearb:
 	$(WAF) configure simplearb $(PARAMS)
 
+simplearb2:
+	$(WAF) configure simplearb2 $(PARAMS)
+
 pairtrading:
 	$(WAF) configure pairtrading $(PARAMS)
 
@@ -44,6 +47,12 @@ simdata:
 
 backtest:
 	$(WAF) configure backtest $(PARAMS)
+
+backtest2:
+	$(WAF) configure backtest2 $(PARAMS)
+
+backtestpr:
+	$(WAF) configure backtestpr $(PARAMS)
 
 order_matcher:
 	$(WAF) configure order_matcher $(PARAMS)

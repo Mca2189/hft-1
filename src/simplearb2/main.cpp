@@ -21,12 +21,6 @@
 
 #include "./strategy.h"
 
-void HandleLeft() {
-}
-
-void PrintResult() {
-}
-
 int main() {
   std::string default_path = GetDefaultPath();
 
@@ -54,6 +48,4 @@ int main() {
 
   StrategyContainer<ZmqRecver> sc(ticker_strat_map);
   sc.Start();
-  HandleLeft();
-  PrintResult();
 }

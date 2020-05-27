@@ -41,15 +41,21 @@ class ctporder_class(BuildContext):
 class manual_ctp_class(BuildContext):
   cmd = "manual_ctp"
 class getins_class(BuildContext):
-  cmd = "get_ins"
+  cmd = "getins"
 class simplemaker_class(BuildContext):
   cmd = "simplemaker"
 class simplearb_class(BuildContext):
   cmd = "simplearb"
+class simplearb2_class(BuildContext):
+  cmd = "simplearb2"
 class pairtrading_class(BuildContext):
   cmd = "pairtrading"
 class backtest_class(BuildContext):
   cmd = "backtest"
+class backtest2_class(BuildContext):
+  cmd = "backtest2"
+class backtestpr_class(BuildContext):
+  cmd = "backtestpr"
 class order_matcher_class(BuildContext):
   cmd = "order_matcher"
 class demostrat_class(BuildContext):
@@ -91,11 +97,20 @@ def build(bld):
   if bld.cmd == "simplearb":
     run_simplearb(bld)
     return
+  if bld.cmd == "simplearb2":
+    run_simplearb2(bld)
+    return
   if bld.cmd == "pairtrading":
     run_pairtrading(bld)
     return
   if bld.cmd == "backtest":
     run_backtest(bld)
+    return
+  if bld.cmd == "backtest2":
+    run_backtest2(bld)
+    return
+  if bld.cmd == "backtestpr":
+    run_backtestpr(bld)
     return
   if bld.cmd == "order_matcher":
     run_order_matcher(bld)
@@ -208,6 +223,22 @@ def run_simplearb(bld):
     use = 'zmq nick pthread config++ shm' # simplearb'
   )
 
+def run_simplearb2(bld):
+  #bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  #bld.read_shlib('simplearb2', paths=['external/strategy/simplearb2/lib'])
+  bld.program(
+    target = 'bin/simplearb2',
+    source = ['src/simplearb2/main.cpp',
+              'src/simplearb2/strategy.cpp'
+             ],
+    includes = [
+                #'external/strategy/simplearb/include',
+                'external/zeromq/include'
+               ],
+    use = 'zmq nick pthread config++ shm' # simplearb'
+  )
+
 def run_pairtrading(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
   bld.program(
@@ -231,6 +262,32 @@ def run_backtest(bld):
              ],
     includes = [
                 #'external/strategy/backtest/include',
+                'external/zeromq/include'
+                ],
+    use = 'zmq nick pthread config++ python2.7 z'
+  )
+
+def run_backtest2(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.program(
+    target = 'bin/backtest2',
+    source = ['src/backtest2/main.cpp',
+              'src/backtest2/strategy.cpp'
+             ],
+    includes = [
+                'external/zeromq/include'
+                ],
+    use = 'zmq nick pthread config++ python2.7 z'
+  )
+
+def run_backtestpr(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.program(
+    target = 'bin/backtestpr',
+    source = ['src/backtestpr/main.cpp',
+              'src/backtestpr/strategy.cpp'
+             ],
+    includes = [
                 'external/zeromq/include'
                 ],
     use = 'zmq nick pthread config++ python2.7 z'
@@ -273,8 +330,11 @@ def run_all(bld):
   run_manual_ctp(bld)
   run_getins(bld)
   run_simplearb(bld)
+  run_simplearb2(bld)
   run_pairtrading(bld)
   run_backtest(bld)
+  run_backtest2(bld)
+  run_backtestpr(bld)
   run_order_matcher(bld)
   run_demostrat(bld)
   run_simplemaker(bld)
