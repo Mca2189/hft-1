@@ -52,6 +52,8 @@ class pairtrading_class(BuildContext):
   cmd = "pairtrading"
 class backtest_class(BuildContext):
   cmd = "backtest"
+class backtest2_class(BuildContext):
+  cmd = "backtest2"
 class backtestpr_class(BuildContext):
   cmd = "backtestpr"
 class order_matcher_class(BuildContext):
@@ -103,6 +105,9 @@ def build(bld):
     return
   if bld.cmd == "backtest":
     run_backtest(bld)
+    return
+  if bld.cmd == "backtest2":
+    run_backtest2(bld)
     return
   if bld.cmd == "backtestpr":
     run_backtestpr(bld)
@@ -262,6 +267,19 @@ def run_backtest(bld):
     use = 'zmq nick pthread config++ python2.7 z'
   )
 
+def run_backtest2(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.program(
+    target = 'bin/backtest2',
+    source = ['src/backtest2/main.cpp',
+              'src/backtest2/strategy.cpp'
+             ],
+    includes = [
+                'external/zeromq/include'
+                ],
+    use = 'zmq nick pthread config++ python2.7 z'
+  )
+
 def run_backtestpr(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
   bld.program(
@@ -315,6 +333,7 @@ def run_all(bld):
   run_simplearb2(bld)
   run_pairtrading(bld)
   run_backtest(bld)
+  run_backtest2(bld)
   run_backtestpr(bld)
   run_order_matcher(bld)
   run_demostrat(bld)

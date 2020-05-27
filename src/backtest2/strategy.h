@@ -1,5 +1,5 @@
-#ifndef SRC_SIMPLEARB2_STRATEGY_H_
-#define SRC_SIMPLEARB2_STRATEGY_H_
+#ifndef SRC_BACKTEST2_STRATEGY_H_
+#define SRC_BACKTEST2_STRATEGY_H_
 
 #include <libconfig.h++>
 #include <unordered_map>
@@ -98,4 +98,4 @@ class Strategy : public BaseStrategy {
   std::ofstream* exchange_file_;
 };
 
-#endif  // SRC_SIMPLEARB2_STRATEGY_H_
+#endif  // SRC_BACKTEST2_STRATEGY_H_

@@ -67,14 +67,14 @@ int main() {
   }
   CThostFtdcTraderApi* user_api = CThostFtdcTraderApi::CreateFtdcTraderApi();
 
-  /*
   std::string broker = "9999";
   std::string username = "116909";
   std::string password = "yifeng";
-  */
+  /*
   std::string broker = "9999";
   std::string username = "115686";
   std::string password = "fz567789";
+  */
   ::unordered_map<int, int> order_id_map;
 
   TokenManager tm;

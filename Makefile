@@ -48,6 +48,9 @@ simdata:
 backtest:
 	$(WAF) configure backtest $(PARAMS)
 
+backtest2:
+	$(WAF) configure backtest2 $(PARAMS)
+
 backtestpr:
 	$(WAF) configure backtestpr $(PARAMS)
 
