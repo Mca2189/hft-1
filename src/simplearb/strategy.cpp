@@ -392,7 +392,7 @@ void Strategy::Open(OrderSide::Enum side) {
   int pos = m_position_map[main_ticker];
   printf("[%s %s] open %s: pos is %d, diff is %lf\n", main_ticker.c_str(), hedge_ticker.c_str(), OrderSide::ToString(side), pos, GetPairMid());
   if (m_order_map.empty()) {  // no block order, can add open
-    Order* o = NewOrder(main_ticker, side, 1, false, false, "", no_close_today);
+    Order* o = NewOrder(main_ticker, side, 1, false, false, "open", no_close_today);
     RecordSlip(main_ticker, o->side);
     o->Show(stdout);
     // printf("spread is %lf %lf min_profit is %lf, next open will be %lf\n", m_shot_map[main_ticker].asks[0]-m_shot_map[main_ticker].bids[0], m_shot_map[hedge_ticker].asks[0]-m_shot_map[hedge_ticker].bids[0], min_profit, side == OrderSide::Buy ? down_diff: up_diff);
@@ -616,7 +616,7 @@ void Strategy::HandleTestOrder(Order* o) {
   // m_position_map[o->ticker] += o->side == OrderSide::Buy ? o->size : -o->size;
   exchange_file->write(reinterpret_cast<char*>(&info), sizeof(info));
   exchange_file->flush();
-  info.Show(stdout);
+  // info.Show(stdout);
   UpdatePos(o, info);
   // m_order_map.clear();
   PrintMap(m_position_map);
@@ -668,8 +668,6 @@ void Strategy::RecordPnl(Order* o, bool force_flat) {
 }
 
 void Strategy::DoOperationAfterFilled(Order* o, const ExchangeInfo& info) {
-  PrintMap(m_avgcost_map);
-  o->Show(stdout);
   if (strcmp(o->ticker, main_ticker.c_str()) == 0) {
     // get hedged right now
     std::string a = o->tbd;
