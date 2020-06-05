@@ -64,7 +64,7 @@ class BaseStrategy {
 
   void RequestQryPos();
   // automatic control function
-  void CheckStatus(const MarketSnapshot& shot);
+  void CheckStatus(const MarketSnapshot& shot, TimeStatus::Enum time_status);
   void UpdatePos(Order* o, const ExchangeInfo& info);
   void UpdateAvgCost(const std::string & ticker, double trade_price, int size);
   bool TimeUp() const;

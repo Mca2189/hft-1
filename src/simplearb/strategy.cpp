@@ -352,6 +352,7 @@ void Strategy::Flatting() {
 }
 
 bool Strategy::NewHigh(OrderSide::Enum side) {
+  return false;
   if (hedge_bid.size() < 6) {
     printf("no enough data in deque\n");
     return true;
@@ -449,9 +450,9 @@ void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
     if (num_sample > train_samples && num_sample % (train_samples) == 1) {
       CalParams();
     }
-    if (m_mode == StrategyMode::Real) {
+    // if (m_mode == StrategyMode::Real) {
       printf("%ld [%s, %s]mid_diff is %lf\n", shot.time.tv_sec, main_ticker.c_str(), hedge_ticker.c_str(), mid_map[main_ticker]-mid_map[hedge_ticker]);
-    }
+    // }
     if (m_ss == StrategyStatus::Training) {
       mean = down_diff = up_diff = stop_loss_down_line = stop_loss_up_line = mid;
     }
@@ -606,6 +607,7 @@ void Strategy::HandleTestOrder(Order* o) {
   }
   ExchangeInfo info;
   info.shot_time = o->shot_time;
+  info.show_time = o->shot_time;
   info.type = InfoType::Filled;
   info.trade_size = o->size;
   info.trade_price = o->price;

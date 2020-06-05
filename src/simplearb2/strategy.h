@@ -51,6 +51,7 @@ class Strategy : public BaseStrategy {
 
   bool OpenLogic();
   void CloseLogic();
+  void SoftCloseLogic();
 
   void Open(OrderSide::Enum side);
   bool Close(OrderSide::Enum side);

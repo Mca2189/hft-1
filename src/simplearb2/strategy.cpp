@@ -169,6 +169,27 @@ void Strategy::CloseLogic() {
   }
 }
 
+void Strategy::SoftCloseLogic() {
+  int pos = m_position_map[main_ticker_];
+  if (pos == 0) {
+    return;
+  }
+  double mid = mids_.back();
+  double softmean = (std::get<0>(CalMeanStd(mids_, sample_tail_-100, 100)) + mean_) / 2;
+  // double softmean = (std::get<0>(CalMeanStd(mids_, sample_tail_-100, 100)));
+  if (pos > 0 && mid > softmean + current_spread_/2) {
+    printf("[%s %s]CloseLogic: mid=%lf, softmean=%lf, pos=%d, current_spread_=%lf\n", main_ticker_.c_str(), hedge_ticker_.c_str(), mid, softmean, pos, current_spread_);
+    m_shot_map[main_ticker_].Show(stdout);
+    m_shot_map[hedge_ticker_].Show(stdout);
+    Close(OrderSide::Sell);
+  } else if (pos < 0 && mid < softmean - current_spread_/2) {
+    printf("[%s %s]CloseLogic: mid=%lf, softmean=%lf, pos=%d\n", main_ticker_.c_str(), hedge_ticker_.c_str(), mid, softmean, pos);
+    m_shot_map[main_ticker_].Show(stdout);
+    m_shot_map[hedge_ticker_].Show(stdout);
+    Close(OrderSide::Buy);
+  }
+}
+
 void Strategy::Flatting() {
   if (IsAlign()) {
     CloseLogic();
@@ -208,11 +229,17 @@ bool Strategy::OpenLogic() {
 }
 
 void Strategy::Run() {
-  if (IsAlign() && close_round_ < max_round_) {
-    if (!OpenLogic()) {
-      CloseLogic();
-    }
+  if (!IsAlign() || close_round_ >= max_round_) {
+    return;
+  }
+  if (OpenLogic()) {
+    return;
+  }
+  int num_samples = sample_tail_ - sample_head_;
+  if (num_samples*1.0 / train_samples_ < 0.6) {
+    CloseLogic();
   } else {
+    SoftCloseLogic();
   }
 }
 
@@ -291,7 +318,6 @@ void Strategy::DoOperationAfterFilled(Order* o, const ExchangeInfo& info) {
     std::string tbd = o->tbd;
   bool is_close = (tbd.find("close") != string::npos);
   o->Show(stdout);
-  printf("[%s %s]isclose is %d\n", main_ticker_.c_str(), hedge_ticker_.c_str(), is_close);
   if (strcmp(info.ticker, main_ticker_.c_str()) == 0) {
     double price = (info.side == OrderSide::Buy) ? m_shot_map[hedge_ticker_].bids[0] : m_shot_map[hedge_ticker_].asks[0];
     if (m_mode == StrategyMode::NextTest) {

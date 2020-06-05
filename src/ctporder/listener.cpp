@@ -63,8 +63,8 @@ void Listener::OnRspError(CThostFtdcRspInfoField *info, int request_id, bool is_
 
 void Listener::OnFrontConnected() {
   printf("enter onfrontconnected\n");
-  // message_sender_->Auth();
-  message_sender_->SendLogin();
+  message_sender_->Auth();
+  // message_sender_->SendLogin();
 }
 
 void Listener::OnFrontDisconnected(int reason) {
@@ -377,7 +377,7 @@ void Listener::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* investo
     return;
   }
 
-  printf("%s, Ydposition is %d, position is %d, positioncost is %lf, opencost is %lf\n", investor_position->InstrumentID, investor_position->YdPosition, investor_position->Position, investor_position->PositionCost, investor_position->OpenCost);
+  // printf("%s, Ydposition is %d, position is %d, positioncost is %lf, opencost is %lf\n", investor_position->InstrumentID, investor_position->YdPosition, investor_position->Position, investor_position->PositionCost, investor_position->OpenCost);
   // std::cout << investor_position->InstrumentID << " Ydposition is " << investor_position->InstrumentID <<" position is  " << investor_position->Position << " positioncost is " << investor_position->PositionCost << " opencost is " << investor_position->OpenCost << endl;
 
   if (investor_position) {

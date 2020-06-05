@@ -7,7 +7,8 @@ struct TimeStatus {
     Pause,
     Close,
     Training,
-    ForceClose
+    ForceClose,
+    InValid
   };
 
   static inline const char* ToString(Enum status) {
@@ -30,6 +31,10 @@ struct TimeStatus {
 
      case ForceClose:
        return "ForceClose";
+       break;
+
+     case InValid:
+       return "InValid";
        break;
 
      default:
