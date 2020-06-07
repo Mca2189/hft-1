@@ -46,8 +46,6 @@ class TimeController {
   std::vector<int>close_stop;
   std::vector<int>force_close_start;
   std::vector<int>force_close_stop;
-  std::vector<int>invalid_start;
-  std::vector<int>invalid_stop;
   std::string mode;
   long int timer_sec;
   long int timer_usec;
