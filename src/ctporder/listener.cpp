@@ -63,8 +63,8 @@ void Listener::OnRspError(CThostFtdcRspInfoField *info, int request_id, bool is_
 
 void Listener::OnFrontConnected() {
   printf("enter onfrontconnected\n");
-  message_sender_->Auth();
-  // message_sender_->SendLogin();
+  // message_sender_->Auth();
+  message_sender_->SendLogin();
 }
 
 void Listener::OnFrontDisconnected(int reason) {

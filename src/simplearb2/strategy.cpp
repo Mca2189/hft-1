@@ -283,6 +283,7 @@ void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
   current_spread_ = m_shot_map[main_ticker_].asks[0] - m_shot_map[main_ticker_].bids[0];
   if (IsAlign()) {  // && Spread_Good()) {
     mids_.push_back(GetMid(main_ticker_) - GetMid(hedge_ticker_));
+    printf("[%s %s]mid_diff=%lf, head:%d, tail:%d\n", main_ticker_.c_str(), hedge_ticker_.c_str(), mids_.back(), sample_head_, sample_tail_);
     if (++ sample_tail_ - sample_head_ > train_samples_) {
       UpdateParams("[tail-head hit]");
     }
