@@ -10,8 +10,8 @@
 
 #include "struct/exchange_info.h"
 #include "struct/info_type.h"
-#include "util/zmq_sender.hpp"
-#include "util/contract_worker.h"
+// #include "util/zmq_sender.hpp"
+// #include "util/contract_worker.h"
 #include "./token_manager.h"
 
 class MessageSender;
@@ -23,7 +23,7 @@ class Listener : public CThostFtdcTraderSpi {
            const std::string & error_list,
            std::unordered_map<int, int>* id_map,
            TokenManager* tm,
-           ContractWorker* cw,
+           // ContractWorker* cw,
            bool enable_stdout = true,
            bool enable_file = true);
   ~Listener();
@@ -92,7 +92,7 @@ class Listener : public CThostFtdcTraderSpi {
   // only DCE will auto combine, CZCE won't. we didn't trade combo instrument, so just call it if got combo instrument position
   // bool HandleComboPosition(const CThostFtdcInvestorPositionField* investor_position);
 
-  ZmqSender<ExchangeInfo>* sender;
+  // ZmqSender<ExchangeInfo>* sender;
   MessageSender* message_sender_;
 
   TThostFtdcFrontIDType front_id_;
@@ -106,7 +106,7 @@ class Listener : public CThostFtdcTraderSpi {
   std::map<int, std::string> error_list_;
   std::unordered_map<int, int>* order_id_map;
   TokenManager* t_m;
-  ContractWorker* cw;
+  // ContractWorker* cw;
   FILE* exchange_file;
   FILE* position_file;
   bool e_s;

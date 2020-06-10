@@ -152,7 +152,7 @@ def run_ctporder(bld):
               'src/ctporder/token_manager.cpp',
               'src/ctporder/message_sender.cpp'],
     includes = ['external/ctp/include', 'external/zeromq/include'],
-    use = 'zmq thosttraderapi nick pthread config++'
+    use = 'zmq thosttraderapi pthread config++' # nick'
   )
 def run_manual_ctp(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])

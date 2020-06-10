@@ -8,10 +8,10 @@
 #include <vector>
 #include <memory>
 
-#include "util/dater.h"
-#include "util/contract_worker.h"
-#include "util/zmq_recver.hpp"
-#include "util/zmq_sender.hpp"
+// #include "util/dater.h"
+// #include "util/contract_worker.h"
+// #include "util/zmq_recver.hpp"
+// #include "util/zmq_sender.hpp"
 #include "./message_sender.h"
 #include "./listener.h"
 #include "./token_manager.h"
@@ -36,6 +36,7 @@ std::unordered_map<std::string, std::string> RegisterExchange() {
   return ticker_exchange;
 }
 
+/*
 void* RunOrderCommandListener(void *param) {
   MessageSender* message_sender = reinterpret_cast<MessageSender*>(param);
   auto r = new ZmqRecver<Order>("order_recver");
@@ -58,6 +59,7 @@ void* RunOrderCommandListener(void *param) {
   }
   return NULL;
 }
+*/
 
 int main() {
   enable_file = true;
@@ -91,18 +93,19 @@ int main() {
                                &tm,
                                exchange_map);
 
-  std::string default_path = GetDefaultPath();
-  std::string contract_config_path = default_path + "/hft/config/contract/bk_contract.config";
-  ContractWorker cw(contract_config_path);
+  // std::string default_path = GetDefaultPath();
+  std::string contract_config_path = "/root/hft/config/contract/bk_contract.config";
+  // ContractWorker cw(contract_config_path);
   Listener listener("exchange_info",
                     &message_sender,
                     "error_list",
                     &order_id_map,
                     &tm,
-                    &cw,
+                    // &cw,
                     enable_stdout,
                     enable_file);
 
+  /*
   pthread_t order_thread;
   if (pthread_create(&order_thread,
                      NULL,
@@ -111,6 +114,7 @@ int main() {
     perror("pthread_create");
     exit(1);
   }
+  */
 
   user_api->RegisterSpi(&listener);
   printf("register spi sent\n");

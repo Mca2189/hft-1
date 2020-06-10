@@ -140,6 +140,7 @@ bool MessageSender::Handle(const Order & order) {
 }
 
 bool MessageSender::NewOrder(const Order& order) {
+  /*
   t_m->RegisterOrderRef(order);
   CThostFtdcInputOrderField req;
   memset(&req, 0, sizeof(req));
@@ -175,14 +176,11 @@ bool MessageSender::NewOrder(const Order& order) {
   // The exchange requires us to net positions manually.  We track how many "tokens"
   // we have available to net buy/sell orders.  If it is safe to use a close position
   // order, we do so, as it dramatically reduces margin requirements.
-  /*
   switch (order_data.position_type) {
     case OrderData::kPositionTypeOpen: req.CombOffsetFlag[0] = THOST_FTDC_OF_Open; break;
     case OrderData::kPositionTypeCloseToday: req.CombOffsetFlag[0] = THOST_FTDC_OF_CloseToday; break;
     case OrderData::kPositionTypeCloseYesterday: req.CombOffsetFlag[0] = THOST_FTDC_OF_Close; break;
   }
-  */
-  /*
   if (pos < order.size) {
     req.CombOffsetFlag[0] = THOST_FTDC_OF_Open;
   } else {
@@ -193,7 +191,6 @@ bool MessageSender::NewOrder(const Order& order) {
       (*sell_pos)[order.ticker] -= order.size;
     }
   }
-  */
 
   if (use_arbitrage_orders_) {
     req.CombHedgeFlag[0] = THOST_FTDC_HF_Arbitrage;
@@ -211,13 +208,11 @@ bool MessageSender::NewOrder(const Order& order) {
   CloseType t = t_m->CheckOffset(order);
   printf("%d %d %d\n", t.yes_size, t.tod_size, t.open_size);
 
-  /*
   if (t.NeedSplit()) {
     printf("%s need split handle, but current handler dont support it!, %d %d %d\n", order.order_ref, t.yes_size, t.tod_size, t.open_size);
     t_m->Restore(order);
     return false;
   }
-  */
   req.CombOffsetFlag[0] = t.OffsetFlag;
   switch (order.offset) {
     case Offset::UNINITED:
@@ -248,9 +243,12 @@ bool MessageSender::NewOrder(const Order& order) {
     req.CombOffsetFlag[0]);
 
   return result == 0;
+  */
+  return false;
 }
 
 void MessageSender::CancelOrder(const Order& order) {
+  /*
   CThostFtdcInputOrderActionField req;
   memset(&req, 0, sizeof(req));
 
@@ -281,4 +279,5 @@ void MessageSender::CancelOrder(const Order& order) {
   user_api_->ReqOrderAction(&req, ++request_id_);
 
   printf("SubmitCancel %s ticker %s\n", o.order_ref, o.ticker);
+  */
 }

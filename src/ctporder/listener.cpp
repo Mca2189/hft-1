@@ -17,14 +17,14 @@ Listener::Listener(const std::string & exchange_info_address,
                    const std::string & error_list,
                    std::unordered_map<int, int>*id_map,
                    TokenManager* tm,
-                   ContractWorker* cw,
+                   // ContractWorker* cw,
                    bool enable_stdout,
                    bool enable_file)
   : message_sender_(message_sender),
     initialized_(false),
     order_id_map(id_map),
     t_m(tm),
-    cw(cw),
+    // cw(cw),
     e_s(enable_stdout),
     e_f(enable_file) {
   /*
@@ -41,15 +41,12 @@ Listener::Listener(const std::string & exchange_info_address,
   }
   position_file = fopen("position.csv", "w");
   setbuf(position_file, NULL);
-  sender = new ZmqSender<ExchangeInfo>(exchange_info_address.c_str(), "bind", "ipc", "exchange.dat");
+  // sender = new ZmqSender<ExchangeInfo>(exchange_info_address.c_str(), "bind", "ipc", "exchange.dat");
   // sender = new ZmqSender<ExchangeInfo>(exchange_info_address.c_str(), 100000, "exchange.dat");
 }
 
 Listener::~Listener() {
-  delete sender;
-  if (e_f) {
-    fclose(exchange_file);
-  }
+  // delete sender;
 }
 
 void Listener::OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
@@ -121,6 +118,7 @@ void Listener::OnRspOrderInsert(CThostFtdcInputOrderField* order,
                                 CThostFtdcRspInfoField* info,
                                 int request_id,
                                 bool is_last) {
+  /*
   printf("on errinsert for %s\n", order->OrderRef);
   if (CheckError("OnRspOrderInsert", info, order->OrderRef)) {
     ExchangeInfo exchangeinfo;
@@ -141,15 +139,14 @@ void Listener::OnRspOrderInsert(CThostFtdcInputOrderField* order,
     t_m->HandleCancelled(o);
     SendExchangeInfo(exchangeinfo);
     exchangeinfo.Show(stdout);
-    /*
     HandleOrder(OrderUpdateReason::Rejected,
                 OrderStatus::Rejected,
                 order->OrderRef,
                 order->Direction,
                 0);
-    */
     // TODO(nick): print error
   }
+  */
 }
 
 void Listener::OnErrRtnOrderInsert(CThostFtdcInputOrderField* order,
@@ -171,6 +168,7 @@ void Listener::OnRspOrderAction(CThostFtdcInputOrderActionField* order_action,
                                 bool is_last) {
   // ErrorID = 26 is a failed cancel
   printf("on errrtnorderaction for %s\n", order_action->OrderRef);
+  /*
   if (info->ErrorID == 26) {
     // HandleFailedCancel();
     // TODO(nick): handle error
@@ -189,12 +187,14 @@ void Listener::OnRspOrderAction(CThostFtdcInputOrderActionField* order_action,
     snprintf(exchangeinfo.ticker, sizeof(exchangeinfo.ticker), "%s", o.ticker);
     SendExchangeInfo(exchangeinfo);
   }
+  */
 }
 
 void Listener::OnErrRtnOrderAction(CThostFtdcOrderActionField* order,
                                    CThostFtdcRspInfoField *info) {
   // Cancel after fill
   printf("on errrtnorderaction for %s\n", order->OrderRef);
+  /*
   if (info && info->ErrorID == 91) {
     // HandleFailedCancel();
     // TODO(nick): handle error
@@ -205,9 +205,11 @@ void Listener::OnErrRtnOrderAction(CThostFtdcOrderActionField* order,
     // HandleFailedCancel();
     // TODO(nick): handle
   }
+  */
 }
 
 void Listener::OnRtnOrder(CThostFtdcOrderField* order) {
+  /*
   if (front_id_ != order->FrontID || session_id_ != order->SessionID) {
     printf("[WARNING] got other client's order: %s %.2f %d %s, don't handle\n",
         order->InstrumentID, order->LimitPrice, order->VolumeTotalOriginal, order->OrderRef);
@@ -302,6 +304,7 @@ void Listener::OnRtnOrder(CThostFtdcOrderField* order) {
     order->OrderSubmitStatus,
     order->VolumeTraded,
     order->VolumeTotal);
+  */
 }
 
 void Listener::OnRtnTrade(CThostFtdcTradeField* trade) {
@@ -318,6 +321,7 @@ void Listener::OnRtnTrade(CThostFtdcTradeField* trade) {
   }
   */
 
+  /*
   ExchangeInfo exchangeinfo;
   gettimeofday(&exchangeinfo.show_time, NULL);
   int ctp_order_ref = atoi(trade->OrderRef);
@@ -350,6 +354,7 @@ void Listener::OnRtnTrade(CThostFtdcTradeField* trade) {
     trade->OrderRef,
     trade->Volume,
     trade->Price);
+  */
 }
 
 void Listener::OnRspQryTradingAccount(CThostFtdcTradingAccountField* trading_account,
@@ -380,6 +385,7 @@ void Listener::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* investo
   // printf("%s, Ydposition is %d, position is %d, positioncost is %lf, opencost is %lf\n", investor_position->InstrumentID, investor_position->YdPosition, investor_position->Position, investor_position->PositionCost, investor_position->OpenCost);
   // std::cout << investor_position->InstrumentID << " Ydposition is " << investor_position->InstrumentID <<" position is  " << investor_position->Position << " positioncost is " << investor_position->PositionCost << " opencost is " << investor_position->OpenCost << endl;
 
+  /*
   if (investor_position) {
     bool result = true;
     // init to ignore compile error
@@ -437,9 +443,10 @@ void Listener::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* investo
     printf("Received all positions - safe to trade\n");
     t_m->PrintToken();
   }
+  */
 }
 
 void Listener::SendExchangeInfo(const ExchangeInfo & info) {
-  printf("Sending ExchangeInfo\n");
-  sender->Send(info);
+  // printf("Sending ExchangeInfo\n");
+  // sender->Send(info);
 }
