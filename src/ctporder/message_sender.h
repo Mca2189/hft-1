@@ -20,7 +20,6 @@ class MessageSender {
                 const std::string & password,
                 bool use_arbitrage_orders,
                 std::unordered_map<int, int>*id_map,
-                TokenManager* tm,
                 const std::unordered_map<std::string, std::string>& e_map);
 
   void SetFrontId(int front_id) { front_id_ = front_id; }
@@ -54,7 +53,6 @@ class MessageSender {
   bool use_arbitrage_orders_;
   std::unordered_map<int, int>* order_id_map;  // strat id vs ctp id
   std::unordered_map<int, Order> order_map;  // ctp id vs Order
-  TokenManager* t_m;
   std::unordered_map<std::string, std::string> exchange_map;
 };
 

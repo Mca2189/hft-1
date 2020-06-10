@@ -9,7 +9,6 @@ MessageSender::MessageSender(CThostFtdcTraderApi* user_api,
                              const std::string & password,
                              bool use_arbitrage_orders,
                              std::unordered_map<int, int>*id_map,
-                             TokenManager* tm,
                              const std::unordered_map<std::string, std::string>& e_map)
   : user_api_(user_api),
     broker_id_(broker_id),
@@ -19,7 +18,6 @@ MessageSender::MessageSender(CThostFtdcTraderApi* user_api,
     ctp_order_ref(0),
     use_arbitrage_orders_(use_arbitrage_orders),
     order_id_map(id_map),
-    t_m(tm),
     exchange_map(e_map) {
 }
 
@@ -93,7 +91,6 @@ void MessageSender::SendQueryTradingAccount() {
 
 void MessageSender::SendQueryInvestorPosition() {
   sleep(1);
-  t_m->Init();
   CThostFtdcQryInvestorPositionField investor_position;
   memset(&investor_position, 0, sizeof(investor_position));
 

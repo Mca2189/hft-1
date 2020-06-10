@@ -22,7 +22,6 @@ class Listener : public CThostFtdcTraderSpi {
            MessageSender* message_sender,
            const std::string & error_list,
            std::unordered_map<int, int>* id_map,
-           TokenManager* tm,
            // ContractWorker* cw,
            bool enable_stdout = true,
            bool enable_file = true);
