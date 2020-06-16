@@ -170,7 +170,7 @@ void Listener::OnRspOrderAction(CThostFtdcInputOrderActionField* order_action,
                                 int request_id,
                                 bool is_last) {
   // ErrorID = 26 is a failed cancel
-  printf("on errrtnorderaction for %s\n", order_action->OrderRef);
+  printf("on errrtnorderaction for %s, ErrorID is %d, msg is %s\n", order_action->OrderRef, info->ErrorID, info->ErrorMsg);
   if (info->ErrorID == 26) {
     // HandleFailedCancel();
     // TODO(nick): handle error
