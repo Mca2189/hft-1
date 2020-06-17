@@ -82,7 +82,6 @@ int main() {
   */
   ::unordered_map<int, int> order_id_map;
 
-  // TokenManager tm;
   std::unordered_map<std::string, std::string> exchange_map = RegisterExchange();
   MessageSender message_sender(user_api,
                                broker,
@@ -100,8 +99,6 @@ int main() {
                     &message_sender,
                     "error_list",
                     &order_id_map,
-                    // &tm,
-                    // &cw,
                     enable_stdout,
                     enable_file);
 
@@ -117,7 +114,6 @@ int main() {
   */
 
   user_api->RegisterSpi(&listener);
-  printf("register spi sent\n");
 
   user_api->SubscribePrivateTopic(THOST_TERT_QUICK);
   user_api->SubscribePublicTopic(THOST_TERT_QUICK);
