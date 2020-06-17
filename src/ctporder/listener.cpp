@@ -121,7 +121,7 @@ void Listener::OnRspOrderInsert(CThostFtdcInputOrderField* order,
                                 CThostFtdcRspInfoField* info,
                                 int request_id,
                                 bool is_last) {
-  printf("on errinsert for %s\n", order->OrderRef);
+  printf("on errsporderaction for %s, ErrorID is %d, msg is %s\n", order->OrderRef, info->ErrorID, info->ErrorMsg);
   if (CheckError("OnRspOrderInsert", info, order->OrderRef)) {
     ExchangeInfo exchangeinfo;
     gettimeofday(&exchangeinfo.show_time, NULL);
@@ -154,7 +154,7 @@ void Listener::OnRspOrderInsert(CThostFtdcInputOrderField* order,
 
 void Listener::OnErrRtnOrderInsert(CThostFtdcInputOrderField* order,
                                    CThostFtdcRspInfoField *info) {
-  printf("on errrtnorderinsert for %s\n", order->OrderRef);
+  printf("on errrtnorderaction for %s, ErrorID is %d, msg is %s\n", order->OrderRef, info->ErrorID, info->ErrorMsg);
   if (!CheckError("OnErrRtnOrderInsert", info, order->OrderRef)) {
     printf("Got unexpected OnErrRtnOrderInsert");
   }
@@ -170,10 +170,11 @@ void Listener::OnRspOrderAction(CThostFtdcInputOrderActionField* order_action,
                                 int request_id,
                                 bool is_last) {
   // ErrorID = 26 is a failed cancel
-  printf("on errrtnorderaction for %s\n", order_action->OrderRef);
+  printf("on errrtnorderaction for %s, ErrorID is %d, msg is %s\n", order_action->OrderRef, info->ErrorID, info->ErrorMsg);
   if (info->ErrorID == 26) {
     // HandleFailedCancel();
     // TODO(nick): handle error
+    printf("%s Filled, cancel failed!\n", order_action->OrderRef);
     return;
   }
 
