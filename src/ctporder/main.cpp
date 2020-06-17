@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <zmq.hpp>
 #include <ThostFtdcTraderApi.h>
 #include <unordered_map>
 

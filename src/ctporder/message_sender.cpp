@@ -36,7 +36,6 @@ void MessageSender::Auth() {
   int result = user_api_->ReqAuthenticate(&reqauth, ++request_id_);
   if (result != 0) {
     printf("Get Auth failed!(%d)\n", result);
-    sleep(1);
     throw std::runtime_error("Auth failed");
   }
 }
@@ -54,7 +53,6 @@ void MessageSender::SendLogin() {
   int result = user_api_->ReqUserLogin(&request, ++request_id_);
   if (result != 0) {
     printf("SendLogin failed! (%d)\n", result);
-    sleep(1);
     throw std::runtime_error("Login failed");
   }
 }
@@ -69,7 +67,6 @@ void MessageSender::SendSettlementInfoConfirm() {
   int result = user_api_->ReqSettlementInfoConfirm(&req, ++request_id_);
   if (result != 0) {
     printf("SendSettlementInfo failed! (%d)", result);
-    sleep(1);
     throw std::runtime_error("SendSettlementInfo failed");
   }
 }
@@ -84,13 +81,11 @@ void MessageSender::SendQueryTradingAccount() {
   int result = user_api_->ReqQryTradingAccount(&trading_account, ++request_id_);
   if (result != 0) {
     printf("SendQueryTradingAccount failed! (%d)", result);
-    sleep(1);
     throw std::runtime_error("SendQueryTradingAccount failed");
   }
 }
 
 void MessageSender::SendQueryInvestorPosition() {
-  sleep(1);
   // t_m->Init();
   CThostFtdcQryInvestorPositionField investor_position;
   memset(&investor_position, 0, sizeof(investor_position));
@@ -103,11 +98,9 @@ void MessageSender::SendQueryInvestorPosition() {
       printf("send query request ok!\n");
       return;
     }
-    usleep(50000);
   }
 
   printf("SendQueryInvestorPosition failed! (%d)", result);
-  sleep(1);
   // throw std::runtime_error("SendQueryInvestorPosition failed");
   exit(1);
 }

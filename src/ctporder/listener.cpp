@@ -48,7 +48,6 @@ Listener::~Listener() {
 }
 
 void Listener::OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-  sleep(2);
   message_sender_->SendLogin();
 }
 
@@ -78,7 +77,6 @@ void Listener::OnRspUserLogin(CThostFtdcRspUserLoginField* user_login,
   if (is_last) {
     if (CheckError("OnRspUserLogin", info)) {
       printf("%d\n", CheckError("OnRspUserLogin", info));
-      sleep(1);
       exit(1);
     }
 
