@@ -31,7 +31,7 @@ class Listener : public CThostFtdcTraderSpi {
 
     snprintf(request.BrokerID, sizeof(request.BrokerID), "%s", "9999");
     snprintf(request.UserID, sizeof(request.UserID), "%s", "115686");
-    snprintf(request.Password, sizeof(request.Password), "%s", "");
+    snprintf(request.Password, sizeof(request.Password), "%s", "fz567789");
 
     printf("Connected\n");
 
