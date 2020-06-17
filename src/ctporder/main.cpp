@@ -14,7 +14,7 @@
 // #include "util/zmq_sender.hpp"
 #include "./message_sender.h"
 #include "./listener.h"
-#include "./token_manager.h"
+// #include "./token_manager.h"
 
 FILE* order_file;
 bool enable_stdout = true;
@@ -82,7 +82,7 @@ int main() {
   */
   ::unordered_map<int, int> order_id_map;
 
-  TokenManager tm;
+  // TokenManager tm;
   std::unordered_map<std::string, std::string> exchange_map = RegisterExchange();
   MessageSender message_sender(user_api,
                                broker,
@@ -90,7 +90,7 @@ int main() {
                                password,
                                false,
                                &order_id_map,
-                               &tm,
+                               // &tm,
                                exchange_map);
 
   // std::string default_path = GetDefaultPath();
@@ -100,7 +100,7 @@ int main() {
                     &message_sender,
                     "error_list",
                     &order_id_map,
-                    &tm,
+                    // &tm,
                     // &cw,
                     enable_stdout,
                     enable_file);

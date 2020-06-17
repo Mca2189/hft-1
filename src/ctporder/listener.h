@@ -12,7 +12,6 @@
 #include "struct/info_type.h"
 // #include "util/zmq_sender.hpp"
 // #include "util/contract_worker.h"
-#include "./token_manager.h"
 
 class MessageSender;
 
@@ -22,7 +21,6 @@ class Listener : public CThostFtdcTraderSpi {
            MessageSender* message_sender,
            const std::string & error_list,
            std::unordered_map<int, int>* id_map,
-           TokenManager* tm,
            // ContractWorker* cw,
            bool enable_stdout = true,
            bool enable_file = true);
@@ -105,7 +103,6 @@ class Listener : public CThostFtdcTraderSpi {
 
   std::map<int, std::string> error_list_;
   std::unordered_map<int, int>* order_id_map;
-  TokenManager* t_m;
   // ContractWorker* cw;
   FILE* exchange_file;
   FILE* position_file;
