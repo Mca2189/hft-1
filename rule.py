@@ -316,8 +316,9 @@ def run_demostrat(bld):
 def run_demostrat(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
   bld.program(
-    target = 'bin/simdata',
-    source = ['src/simdata/main.cpp'],
+    target = 'bin/demostrat',
+    source = ['src/demostrat/main.cpp',
+              'src/demostrat/strategy.cpp'],
     includes = ['external/zeromq/include'],
     use = 'zmq nick pthread config++ z'
   )

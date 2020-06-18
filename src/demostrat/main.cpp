@@ -2,11 +2,15 @@
 #include <stdio.h>
 #include <zmq.hpp>
 #include <struct/order.h>
-#include <util/zmq_recver.hpp>
-#include <util/zmq_sender.hpp>
 #include <struct/market_snapshot.h>
+#include <core/strategy_container.hpp>
 #include <util/common_tools.h>
 #include <core/base_strategy.h>
+#include <util/history_worker.h>
+#include <util/dater.h>
+#include <util/zmq_recver.hpp>
+#include <util/zmq_sender.hpp>
+#include <thread>
 #include <unordered_map>
 
 #include <iostream>
@@ -15,7 +19,7 @@
 #include <vector>
 #include <string>
 
-#include "demostrat/strategy.h"
+#include "./strategy.h"
 
 void HandleLeft() {
 }
@@ -23,46 +27,16 @@ void HandleLeft() {
 void PrintResult() {
 }
 
-
-void* RunExchangeListener(void *param) {
-  std::unordered_map<std::string, std::vector<BaseStrategy*> > * sv_map = reinterpret_cast<std::unordered_map<std::string, std::vector<BaseStrategy*> >* >(param);
-  ZmqRecver<ExchangeInfo> recver("exchange_info");
-  while (true) {
-    ExchangeInfo info;
-    recver.Recv(info);
-    std::vector<BaseStrategy*> sv = (*sv_map)[info.ticker];
-    for (auto v : sv) {
-      v->UpdateExchangeInfo(info);
-    }
-  }
-  return NULL;
-}
-
 int main() {
+  std::unique_ptr<ZmqSender<Order> > order_sender(new ZmqSender<Order>("order_sender", "connect", "ipc", "order.dat"));
+  std::string default_path = GetDefaultPath();
   std::unordered_map<std::string, std::vector<BaseStrategy*> > ticker_strat_map;
-  ZmqRecver<MarketSnapshot> data_recver("data_recver");
-  std::vector<BaseStrategy*> sv;
-  sv.emplace_back(new Strategy(&ticker_strat_map));
-  pthread_t exchange_thread;
-  if (pthread_create(&exchange_thread,
-                     NULL,
-                     &RunExchangeListener,
-                     &ticker_strat_map) != 0) {
-    perror("pthread_create");
-    exit(1);
-  }
-  sleep(3);
-  sv.back()->RequestQryPos();
-  printf("send query position ok!\n");
-  while (true) {
-    MarketSnapshot shot;
-    data_recver.Recv(shot);
-    shot.is_initialized = true;
-    std::vector<BaseStrategy*> sv = ticker_strat_map[shot.ticker];
-    for (auto v : sv) {
-      v->UpdateData(shot);
-    }
-  }
+  std::string time_config_path = default_path + "/hft/config/prod/time.config";
+  TimeController tc(time_config_path);
+  auto s = new Strategy(&ticker_strat_map, order_sender.get(), &tc);
+  s->Print();
+  StrategyContainer<ZmqRecver> sc(ticker_strat_map);
+  sc.Start();
   HandleLeft();
   PrintResult();
 }
