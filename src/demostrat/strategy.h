@@ -18,12 +18,9 @@
 
 class Strategy : public BaseStrategy {
  public:
-  explicit Strategy(std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map);
+  explicit Strategy(std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<Order>* ordersender, TimeController* tc);
   ~Strategy();
 
-  // must realize
-  void Start() override;
-  void Stop() override;
  private:
   // not must realize, but usually, it should
   void DoOperationAfterUpdatePos(Order* o, const ExchangeInfo& info) override;
@@ -34,13 +31,9 @@ class Strategy : public BaseStrategy {
   // not must
   void ModerateOrders(const std::string & contract) override;
 
-  void Init() override;
+  void Start() override;
   bool Ready() override;
-  void Pause() override;
-  void Resume() override;
   void Run() override;
-  void Train() override;
-  void Flatting() override;
 
   // must realize, define the order price logic when send an order
   double OrderPrice(const std::string & contract, OrderSide::Enum side, bool control_price) override;
