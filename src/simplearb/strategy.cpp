@@ -548,11 +548,14 @@ void Strategy::ModerateOrders(const std::string & ticker) {
           }
         } else if (ticker == hedge_ticker) {
           // printf("[%s %s]Slip point for :modify %s order %s: %lf->%lf mpv=%lf\n", main_ticker.c_str(), hedge_ticker.c_str(), OrderSide::ToString(o->side), o->order_ref, o->price, reasonable_price, min_price_move);
+          /*
           if (m_shot_map[hedge_ticker].time.tv_sec - o->shot_time.tv_sec >= 3) {
             printf("[%s %s] cancel hedge order, bc not filled in 3s\n", main_ticker.c_str(), hedge_ticker.c_str());
             m_shot_map[hedge_ticker].Show(stdout);
             ModOrder(o);
           }
+          */
+          ModOrder(o);
         } else {
           continue;
         }
