@@ -40,7 +40,7 @@ Currently, the repository opened the strategy code, exchange api code, backtest 
 
 any questions or suggestions are welcome, please contract me with:huangxy17@fudan.edu.cn, i will list your name here to thanks for your contribution.
 
-### latency:
+### trading system latency:
 ![pnl](https://github.com/nickhuangxinyu/hft/blob/master/example1.png "latency")
 
 ### Thanks list :
