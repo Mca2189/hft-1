@@ -41,7 +41,7 @@ Currently, the repository opened the strategy code, exchange api code, backtest 
 any questions or suggestions are welcome, please contract me with:huangxy17@fudan.edu.cn, i will list your name here to thanks for your contribution.
 
 ### Trading system latency:
-![pnl](https://github.com/nickhuangxinyu/hft/blob/master/latency.png "latency")
+![latency](https://github.com/nickhuangxinyu/hft/blob/master/latency.png "latency")
 
 ### Thanks list :
 * ShengRui zhao: most active products getting tools on futures market, fill the detail config for all contracts.
