@@ -106,7 +106,7 @@ void Strategy::Stop() {
   m_ss = StrategyStatus::Stopped;
 }
 
-bool Strategy::IsAlign() {
+inline bool Strategy::IsAlign() {
   if (m_shot_map[main_ticker].time.tv_sec == m_shot_map[hedge_ticker].time.tv_sec && abs(m_shot_map[main_ticker].time.tv_usec-m_shot_map[hedge_ticker].time.tv_usec) < 100000) {
     return true;
   }

@@ -195,9 +195,10 @@ void Listener::OnRspOrderAction(CThostFtdcInputOrderActionField* order_action,
 void Listener::OnErrRtnOrderAction(CThostFtdcOrderActionField* order,
                                    CThostFtdcRspInfoField *info) {
   // Cancel after fill
-  printf("on errrtnorderaction for %s\n", order->OrderRef);
+  printf("on errrtnorderaction for %s, ErrorID is %d, msg is %s\n", order->OrderRef, info->ErrorID, info->ErrorMsg);
   if (info && info->ErrorID == 91) {
     // HandleFailedCancel();
+    printf("%s Filled, cancel filled!\n", order->OrderRef);
     // TODO(nick): handle error
     return;
   }
