@@ -67,10 +67,13 @@ int main() {
   }
   CThostFtdcTraderApi* user_api = CThostFtdcTraderApi::CreateFtdcTraderApi();
 
+  std::string broker = "9999";
+  std::string username = "116909";
+  std::string password = "yifeng";
+  /*
   std::string broker = "1025";
   std::string username = "920207";
   std::string password = "584hxy..";
-  /*
   std::string broker = "8060";
   std::string username = "9030001896";
   std::string password = "yifeng";
@@ -120,9 +123,9 @@ int main() {
 
   user_api->SubscribePrivateTopic(THOST_TERT_QUICK);
   user_api->SubscribePublicTopic(THOST_TERT_QUICK);
-  // std::string counterparty_host = "tcp://101.226.250.179:51205";  // simnow
+  std::string counterparty_host = "tcp://180.168.146.187:10100";  // simnow
   // std::string counterparty_host = "tcp://180.166.65.121:41205";  // zhaoshang
-  std::string counterparty_host = "tcp://101.226.250.179:51205";
+  // std::string counterparty_host = "tcp://101.226.250.179:51205";
   user_api->RegisterFront(const_cast<char*>(counterparty_host.c_str()));
   user_api->Init();
   if (enable_file) {

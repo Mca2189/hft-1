@@ -63,8 +63,8 @@ void Listener::OnRspError(CThostFtdcRspInfoField *info, int request_id, bool is_
 
 void Listener::OnFrontConnected() {
   printf("enter onfrontconnected\n");
-  message_sender_->Auth();
-  // message_sender_->SendLogin();
+  // message_sender_->Auth();
+  message_sender_->SendLogin();
 }
 
 void Listener::OnFrontDisconnected(int reason) {
@@ -368,7 +368,7 @@ void Listener::OnRspSettlementInfoConfirm(
   bool is_last) {
   // Now, query all our outstanding positions so we can figure out if we
   // can net orders.
-  message_sender_->SendQueryInvestorPosition();
+  // message_sender_->SendQueryInvestorPosition();
 }
 
 void Listener::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* investor_position,
