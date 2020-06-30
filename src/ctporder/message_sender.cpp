@@ -31,8 +31,10 @@ void MessageSender::Auth() {
   memset(&reqauth, 0, sizeof(reqauth));
   strncpy(reqauth.BrokerID, broker_id_.c_str(), sizeof(reqauth.BrokerID));
   strncpy(reqauth.UserID, user_id_.c_str(), sizeof(reqauth.UserID));
-  strncpy(reqauth.AppID, "client_9030001896_v1", sizeof(reqauth.AppID));
-  strncpy(reqauth.AuthCode, "AQ1963JWQ6ATP9FE", sizeof(reqauth.AuthCode));
+  strncpy(reqauth.AppID, "client_hft_168", sizeof(reqauth.AppID));
+  strncpy(reqauth.AuthCode, "9DEYFJ0E8189C29C", sizeof(reqauth.AuthCode));
+  // strncpy(reqauth.AppID, "client_9030001896_v1", sizeof(reqauth.AppID));
+  // strncpy(reqauth.AuthCode, "AQ1963JWQ6ATP9FE", sizeof(reqauth.AuthCode));
 
   printf("Get Auth...\n");
   int result = user_api_->ReqAuthenticate(&reqauth, ++request_id_);
