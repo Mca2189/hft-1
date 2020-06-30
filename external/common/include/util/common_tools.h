@@ -184,4 +184,6 @@ std::tuple<double, double> CalMeanStd(const T & v, int head, int num) {
   return std::tie(mean, std);
 }
 
+double RoundPrice(double price, double min_price, int size = 1);
+
 #endif // COMMON_TOOLS_H_

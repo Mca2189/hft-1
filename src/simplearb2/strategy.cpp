@@ -107,9 +107,10 @@ double Strategy::OrderPrice(const std::string & ticker, OrderSide::Enum side, bo
     }
   } else {
     if (ticker == hedge_ticker_) {
-      return (side == OrderSide::Buy)?m_shot_map[hedge_ticker_].asks[0]:m_shot_map[hedge_ticker_].bids[0];
+      return (side == OrderSide::Buy) ? m_shot_map[hedge_ticker_].asks[0] : m_shot_map[hedge_ticker_].bids[0];
     } else if (ticker == main_ticker_) {
-      return (side == OrderSide::Buy)?m_shot_map[main_ticker_].asks[0]:m_shot_map[main_ticker_].bids[0];
+      // price hunter mode
+      return (side == OrderSide::Buy) ? RoundPrice(m_shot_map[hedge_ticker_].bids[0] + down_diff_, min_price_move_, 1) : RoundPrice(m_shot_map[hedge_ticker_].asks[0] + up_diff_, min_price_move_, -1);
     } else {
       printf("error ticker %s\n", ticker.c_str());
       return -1.0;
@@ -210,35 +211,26 @@ void Strategy::Open(OrderSide::Enum side) {
 }
 
 bool Strategy::OpenLogic() {
-  // double mid = mids_.back();
-  // if (abs(m_position_map[main_ticker_]) >= max_pos_ || (down_diff_ < mid && mid < up_diff_) || !m_order_map.empty()) {
   if (abs(m_position_map[main_ticker_]) >= max_pos_ || !m_order_map.empty()) {
     return false;
   }
-  /*
-  if (mid > up_diff_ + current_spread_/2) {
-    printf("[%s %s]OpenLogic: mid=%lf, down=%lf, up=%lf current_spread_=%lf\n", main_ticker_.c_str(), hedge_ticker_.c_str(), mid, down_diff_, up_diff_, current_spread_);
-    m_shot_map[main_ticker_].Show(stdout);
-    m_shot_map[hedge_ticker_].Show(stdout);
-    Open(OrderSide::Sell);
-  } else if (mid < down_diff_ - current_spread_/2) {
-    printf("[%s %s]OpenLogic: mid=%lf, down=%lf, up=%lf current_spread_=%lf\n", main_ticker_.c_str(), hedge_ticker_.c_str(), mid, down_diff_, up_diff_, current_spread_);
-    m_shot_map[main_ticker_].Show(stdout);
-    m_shot_map[hedge_ticker_].Show(stdout);
-    Open(OrderSide::Buy);
-  }
-  */
   auto main_shot = m_shot_map[main_ticker_];
   auto hedge_shot = m_shot_map[hedge_ticker_];
-  if (main_shot.asks[0] >= hedge_shot.asks[0] + up_diff_) {
-    PlaceOrder(main_ticker_, main_shot.asks[0] + up_diff_, -1, no_close_today_, "open")->Show(stdout);
-    m_shot_map[main_ticker_].Show(stdout);
-    m_shot_map[hedge_ticker_].Show(stdout);
-  } else if (main_shot.bids[0] <= hedge_shot.bids[0] + down_diff_) {
-    PlaceOrder(main_ticker_, main_shot.asks[0] + up_diff_, -1, no_close_today_, "open")->Show(stdout);
-    m_shot_map[main_ticker_].Show(stdout);
-    m_shot_map[hedge_ticker_].Show(stdout);
+  if (main_shot.asks[0] - hedge_shot.asks[0] >= up_diff_) {  // sell at high price
+    if (hedge_shot.ask_sizes[0] < 5) {  // filter those too thin oppounity
+      return false;
+    }
+    PlaceOrder(main_ticker_, main_shot.asks[0], -1, no_close_today_, "open")->Show(stdout);
+  } else if (main_shot.bids[0] - hedge_shot.bids[0] <= down_diff_) {  // buy at low price
+    if (hedge_shot.bid_sizes[0] < 5) {  // filter those too thin oppounity
+      return false;
+    }
+    PlaceOrder(main_ticker_, main_shot.bids[0], 1, no_close_today_, "open")->Show(stdout);
+  } else {
+    return false;
   }
+  m_shot_map[main_ticker_].Show(stdout);
+  m_shot_map[hedge_ticker_].Show(stdout);
   return true;
 }
 
@@ -249,12 +241,7 @@ void Strategy::Run() {
   if (OpenLogic()) {
     return;
   }
-  int num_samples = sample_tail_ - sample_head_;
-  if (num_samples*1.0 / train_samples_ < 0.6) {
-    CloseLogic();
-  } else {
-    SoftCloseLogic();
-  }
+  CloseLogic();
 }
 
 void Strategy::UpdateParams(const std::string& tag) {
@@ -279,7 +266,6 @@ void Strategy::UpdateParams(const std::string& tag) {
 }
 
 void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
-  // current_spread_ = m_shot_map[main_ticker_].asks[0] - m_shot_map[main_ticker_].bids[0] + m_shot_map[hedge_ticker_].asks[0] - m_shot_map[hedge_ticker_].bids[0];
   current_spread_ = m_shot_map[main_ticker_].asks[0] - m_shot_map[main_ticker_].bids[0];
   if (IsAlign()) {  // && Spread_Good()) {
     mids_.push_back(GetMid(main_ticker_) - GetMid(hedge_ticker_));
@@ -307,21 +293,14 @@ void Strategy::ModerateOrders(const std::string & ticker) {
     if (!o->Valid()) {
       continue;
     }
-    MarketSnapshot shot = m_shot_map[o->ticker];
-    double reasonable_price = (o->side == OrderSide::Buy ? shot.asks[0] : shot.bids[0]);
-    bool is_price_move = (fabs(reasonable_price - o->price) >= min_price_move_/2);
-    if (!is_price_move) {
-      continue;
+    // MarketSnapshot shot = m_shot_map[o->ticker];
+    double reasonable_price = OrderPrice(o->ticker, o->side, false);
+    if (fabs(reasonable_price - o->price) < min_price_move_ / 2) {  // this tick is the order sent tick or tick price not changed
+      return;
     }
     if (o->ticker == main_ticker_) {
-      /*
-      if ((o->side == OrderSide::Buy && m_shot_map[hedge_ticker_].bids[0] - this->target_hedge_price_ < -1e-4) ||
-          (o->side == OrderSide::Sell && m_shot_map[hedge_ticker_].asks[0] - this->target_hedge_price_ > -1e-4) ) {
-        CancelOrder(o);
-      }
-      */
-      if ((o->side == OrderSide::Buy && m_shot_map[main_ticker_].bids[0] >= m_shot_map[hedge_ticker_].bids[0] + mean_)
-       && (o->side == OrderSide::Sell && m_shot_map[main_ticker_].asks[0] <= m_shot_map[hedge_ticker_].asks[0] + mean_)) {
+      if ((o->side == OrderSide::Buy && o->price - reasonable_price >= min_price_move_ / 2)  //  buy, order price > reasonable buy price, loss
+       || (o->side == OrderSide::Sell && o->price - reasonable_price <= min_price_move_ / 2)) {  // sell, order price < reasonable sell
         CancelOrder(o);
       }
     } else if (o->ticker == hedge_ticker_) {
@@ -361,7 +340,7 @@ void Strategy::DoOperationAfterFilled(Order* o, const ExchangeInfo& info) {
 }
 
 bool Strategy::Spread_Good() {
-  return (current_spread_ > spread_threshold_) ? false : true;
+  return current_spread_ <= spread_threshold_;
 }
 
 bool Strategy::IsAlign() {
