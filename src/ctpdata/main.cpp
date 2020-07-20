@@ -201,7 +201,7 @@ class Listener : public CThostFtdcMdSpi {
       sleep(1);
     } else {
       char a[65536][64];
-      char * g_pInstrumentID[2048];
+      char * g_pInstrumentID[65536];
       int count = 0;
       while (!file.eof()) {
         file.getline(a[count], 64);
