@@ -10,6 +10,10 @@
 #include <string>
 #include <vector>
 
+std::string broker_id_ = "8060";
+std::string user_id_ = "9030001896";
+std::string passwd_ = "yifeng";
+
 template<class T>
 void SafeStrCopy(T dest, const char* source) {
   strncpy(dest, source, sizeof(dest));
@@ -25,13 +29,13 @@ class Listener : public CThostFtdcTraderSpi {
       request_id_(1) {
   }
 
-  virtual void OnFrontConnected() {
+  void OnRspAuthenticate(CThostFtdcRspAuthenticateField *pRspAuthenticateField, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
     CThostFtdcReqUserLoginField request;
     memset(&request, 0, sizeof(request));
 
-    snprintf(request.BrokerID, sizeof(request.BrokerID), "%s", "9999");
-    snprintf(request.UserID, sizeof(request.UserID), "%s", "115686");
-    snprintf(request.Password, sizeof(request.Password), "%s", "fz567789");
+    snprintf(request.BrokerID, sizeof(request.BrokerID), "%s", broker_id_.c_str());
+    snprintf(request.UserID, sizeof(request.UserID), "%s", user_id_.c_str());
+    snprintf(request.Password, sizeof(request.Password), "%s", passwd_.c_str());
 
     printf("Connected\n");
 
@@ -39,6 +43,32 @@ class Listener : public CThostFtdcTraderSpi {
     if (result != 0) {
       fprintf(stderr, "Error logging in!");
       exit(1);
+    }
+  }
+
+
+  virtual void OnFrontConnected() {
+    Auth();
+  }
+
+  void Auth() {
+    static const char *version = user_api_->GetApiVersion();
+    printf("Version is %s\n", version);
+    CThostFtdcReqAuthenticateField reqauth;
+    memset(&reqauth, 0, sizeof(reqauth));
+    strncpy(reqauth.BrokerID, broker_id_.c_str(), sizeof(reqauth.BrokerID));
+    strncpy(reqauth.UserID, user_id_.c_str(), sizeof(reqauth.UserID));
+    // strncpy(reqauth.AppID, "client_hft_168", sizeof(reqauth.AppID));
+    // strncpy(reqauth.AuthCode, "9DEYFJ0E8189C29C", sizeof(reqauth.AuthCode));
+    strncpy(reqauth.AppID, "client_9030001896_v1", sizeof(reqauth.AppID));
+    strncpy(reqauth.AuthCode, "AQ1963JWQ6ATP9FE", sizeof(reqauth.AuthCode));
+
+    printf("Get Auth...\n");
+    int result = user_api_->ReqAuthenticate(&reqauth, ++request_id_);
+    if (result != 0) {
+      printf("Get Auth failed!(%d)\n", result);
+      sleep(1);
+      throw std::runtime_error("Auth failed");
     }
   }
 
@@ -91,7 +121,7 @@ int main(int argc, char* argv[]) {
   user_api->SubscribePrivateTopic(THOST_TERT_RESTART);
   user_api->SubscribePublicTopic(THOST_TERT_RESTART);
 
-  std::string counterparty_host = "tcp://180.168.146.187:10100";
+  std::string counterparty_host = "tcp://180.166.65.121:41205";
   user_api->RegisterFront(const_cast<char*>(counterparty_host.c_str()));
   user_api->Init();
 

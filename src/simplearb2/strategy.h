@@ -53,6 +53,12 @@ class Strategy : public BaseStrategy {
   void CloseLogic();
   void SoftCloseLogic();
 
+  bool OpenLongHit();
+  bool OpenShortHit();
+
+  bool CloseLongHit();
+  bool CloseShortHit();
+
   void Open(OrderSide::Enum side);
   bool Close(OrderSide::Enum side);
 
@@ -96,7 +102,10 @@ class Strategy : public BaseStrategy {
   double down_diff_;
   double mean_;
 
+  double realized_diff;
+
   std::ofstream* exchange_file_;
+  std::unordered_map<std::string, double> trade_price_;
 };
 
 #endif  // SRC_SIMPLEARB2_STRATEGY_H_

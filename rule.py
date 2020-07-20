@@ -334,7 +334,7 @@ def run_all(bld):
   run_simplearb2(bld)
   run_pairtrading(bld)
   run_backtest(bld)
-  run_backtest2(bld)
+  #run_backtest2(bld)
   run_backtestpr(bld)
   run_order_matcher(bld)
   run_demostrat(bld)

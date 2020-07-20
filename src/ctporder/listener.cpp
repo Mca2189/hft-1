@@ -132,6 +132,8 @@ void Listener::OnRspOrderInsert(CThostFtdcInputOrderField* order,
     snprintf(exchangeinfo.reason, sizeof(exchangeinfo.reason), "%d", info->ErrorID);
     snprintf(exchangeinfo.ticker, sizeof(exchangeinfo.ticker), "%s", o.ticker);
     snprintf(exchangeinfo.order_ref, sizeof(exchangeinfo.order_ref), "%s", o.order_ref);
+    exchangeinfo.trade_price = o.price;
+    exchangeinfo.trade_size = o.size;
     std::string orderref = t_m->GetOrderRef(ctp_order_ref);
     printf("sent Rej for %s %d back\n", orderref.c_str(), ctp_order_ref);
     if (orderref == "-1") {
@@ -188,6 +190,8 @@ void Listener::OnRspOrderAction(CThostFtdcInputOrderActionField* order_action,
     exchangeinfo.type = InfoType::CancelRej;
     snprintf(exchangeinfo.order_ref, sizeof(exchangeinfo.order_ref), "%s", o.order_ref);
     snprintf(exchangeinfo.ticker, sizeof(exchangeinfo.ticker), "%s", o.ticker);
+    exchangeinfo.trade_price = o.price;
+    exchangeinfo.trade_size = o.size;
     SendExchangeInfo(exchangeinfo);
   }
 }
@@ -232,6 +236,8 @@ void Listener::OnRtnOrder(CThostFtdcOrderField* order) {
   printf("map it into %s\n", orderref.c_str());
   snprintf(exchangeinfo.order_ref, sizeof(exchangeinfo.order_ref), "%s", orderref.c_str());
   snprintf(exchangeinfo.ticker, sizeof(exchangeinfo.ticker), "%s", o.ticker);
+  exchangeinfo.trade_price = o.price;
+  exchangeinfo.trade_size = o.size;
   switch (order->OrderSubmitStatus) {
   /////////////////////////////////////////////////
   // Just logging
