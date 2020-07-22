@@ -9,6 +9,4 @@ pkill -u root data_proxy
 pkill -u root order_proxy
 pkill -u root mid_data
 pkill -u root simplearb
-pkill -u root functional_test
 pkill -u root getins
-pkill -u root functional_test
