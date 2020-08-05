@@ -22,7 +22,7 @@ bool enable_file = true;
 
 std::unordered_map<std::string, std::string> RegisterExchange() {
   std::unordered_map<std::string, std::vector<std::string> > exchange_ticker;
-  exchange_ticker["SHFE"] = {"cu", "ni", "au"};
+  exchange_ticker["SHFE"] = {"cu", "ni", "au", "sn"};
   exchange_ticker["CFFEX"] = {"IH", "IC", "IF", "T"};
   exchange_ticker["CZCE"] = {};
   exchange_ticker["DCE"] = {};
