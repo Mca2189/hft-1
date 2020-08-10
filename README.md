@@ -17,8 +17,6 @@
 * complie command:
   in the path of yourhomepath/hft, run "make", you will get binary file in build/bin
   
-### warning(using waf:python 2 is a must now, 3 will be crashed!!!!!!) ###
-  
 ### Have a quick view ###
 * How to run it
   As a start, you can run ctpdata (after 'make', ./build/bin/ctpdata), if network is good, and time is in the trading session(9:00-11:30 13:30-3:00), you can see marketdata come out in your screen.
