@@ -1,12 +1,14 @@
 #include <stdio.h>
-#include <zmq.hpp>
-#include <util/zmq_recver.hpp>
 #include <unordered_map>
 
 #include <iostream>
 #include <string>
 
-#include "order_matcher/order_handler.h"
+#include <zmq.hpp>
+
+#include "util/zmq_recver.hpp"
+
+#include "./order_handler.h"
 
 void* RunOrderCommandListener(void *param) {
   OrderHandler* order_handler = reinterpret_cast<OrderHandler*>(param);

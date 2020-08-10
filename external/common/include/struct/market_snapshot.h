@@ -108,17 +108,17 @@ struct MarketSnapshot {
 
     int n = std::min(depth, MARKET_DATA_DEPTH);
     for (int i = 0; i < n; ++i) {
-      snprintf(temp, sizeof(temp), "%s %.12g %.12g | %3d x %3d |", temp,
+      snprintf(temp, sizeof(temp), " %.12g %.12g | %3d x %3d |",
               bids[i], asks[i], bid_sizes[i], ask_sizes[i]);
       s += temp;
     }
 
     if (is_trade_update) {
       // T for trade update
-      snprintf(temp, sizeof(temp), "%s %.12g %d %d T\n", temp, last_trade, last_trade_size, volume);
+      snprintf(temp, sizeof(temp), "%.12g %d %d T\n", last_trade, last_trade_size, volume);
     } else {
       // M for market update
-      snprintf(temp, sizeof(temp), "%s %.12g %d %d M %.12g %.12g\n", temp, last_trade, last_trade_size, volume, turnover, open_interest);
+      snprintf(temp, sizeof(temp), "%.12g %d %d M %.12g %.12g\n", last_trade, last_trade_size, volume, turnover, open_interest);
     }
     s += temp;
     return s;

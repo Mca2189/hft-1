@@ -23,6 +23,7 @@ struct ExchangeInfo {
   ExchangeInfo()
     : trade_size(0),
       trade_price(-1) {
+    snprintf(reason, sizeof(reason), "%s", "");
   }
 
   void ShowCsv(FILE* stream) const {

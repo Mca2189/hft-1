@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <zmq.hpp>
 #include <ThostFtdcTraderApi.h>
 #include <unordered_map>
 
@@ -8,6 +7,7 @@
 #include <vector>
 #include <memory>
 
+#include <zmq.hpp>
 #include "util/dater.h"
 #include "util/contract_worker.h"
 #include "util/zmq_recver.hpp"

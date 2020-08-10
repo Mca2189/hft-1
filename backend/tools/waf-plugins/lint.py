@@ -2,8 +2,10 @@
 # encoding: utf-8
 
 import os
+from future.utils import raise_from
 
 def configure(conf):
+  print('***', os.path.dirname(Context.waf_dir))
   conf.find_program('cpplint.py', var='LINT', path_list=[os.path.dirname(Context.waf_dir)])
 
 #########################################
@@ -64,7 +66,7 @@ class lint(Task.Task):
         task.set_inputs(dep)
 
         gen = bld.producer
-        gen.outstanding.insert(0, task)
+        gen.outstanding.appendleft(task)# = [task] + gen.outstanding#.append(0, task)
         gen.total += 1
 
     self.lint_done = True
@@ -72,14 +74,20 @@ class lint(Task.Task):
   def run(self):
     bld = self.generator.bld;
     path = self.inputs[0].path_from(self.generator.bld.bldnode)
+    #print('path', path)
     if lint_should_ignore(path):
       return 0
 
     # Execute lint
-    cmd = '%s %s' % (self.env['LINT'], path)
+    #print('env is', self.env['LINT'])
+    cmd = '%s %s' % (self.env['LINT'][0], path)
+    #print('cmd is', cmd)
     try:
+      #print('var_dir is', bld.variant_dir)
       bld.cmd_and_log(cmd, quiet=Context.BOTH, cwd=bld.variant_dir)
-    except Exception, e:
+    except Exception as e:
       print(e.stderr)
+      if e.stderr =='':
+        return 0
       return 1
     return 0

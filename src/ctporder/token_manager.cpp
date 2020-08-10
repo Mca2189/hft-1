@@ -112,7 +112,10 @@ Order TokenManager::GetOrder(int ctp_order_ref) {
 }
 
 CloseType TokenManager::CheckOffset(Order order) {
-  printf("check offset for order %s: size is %d, side is %s, and token is: buy %d, sell %d, yesbuy %d, yessell %d\n", order.order_ref, order.size, OrderSide::ToString(order.side), buy_token[order.ticker], sell_token[order.ticker], yes_buy_token[order.ticker], yes_sell_token[order.ticker]);
+  printf("check offset for order %s: size is %d, side is %s, and token is: buy %d, sell %d, yesbuy %d, yessell %d\n", order.order_ref, order.size,
+          OrderSide::ToString(order.side), buy_token[order.ticker],
+          sell_token[order.ticker], yes_buy_token[order.ticker],
+          yes_sell_token[order.ticker]);
   int ctp_order_ref = GetCtpId(order);
   int pos;
   int yes_pos;

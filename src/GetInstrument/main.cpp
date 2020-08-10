@@ -16,7 +16,7 @@ std::string passwd_ = "yifeng";
 
 template<class T>
 void SafeStrCopy(T dest, const char* source) {
-  strncpy(dest, source, sizeof(dest));
+  snprintf(dest, source, sizeof(dest));
 }
 
 std::vector<std::vector<std::string> > instruments;
@@ -56,12 +56,12 @@ class Listener : public CThostFtdcTraderSpi {
     printf("Version is %s\n", version);
     CThostFtdcReqAuthenticateField reqauth;
     memset(&reqauth, 0, sizeof(reqauth));
-    strncpy(reqauth.BrokerID, broker_id_.c_str(), sizeof(reqauth.BrokerID));
-    strncpy(reqauth.UserID, user_id_.c_str(), sizeof(reqauth.UserID));
-    // strncpy(reqauth.AppID, "client_hft_168", sizeof(reqauth.AppID));
-    // strncpy(reqauth.AuthCode, "9DEYFJ0E8189C29C", sizeof(reqauth.AuthCode));
-    strncpy(reqauth.AppID, "client_9030001896_v1", sizeof(reqauth.AppID));
-    strncpy(reqauth.AuthCode, "AQ1963JWQ6ATP9FE", sizeof(reqauth.AuthCode));
+    snprintf(reqauth.BrokerID, sizeof(reqauth.BrokerID), "%s", broker_id_.c_str());
+    snprintf(reqauth.UserID, sizeof(reqauth.UserID), "%s", user_id_.c_str());
+    // snprintf(reqauth.AppID, sizeof(reqauth.AppID), "%s", "client_hft_168");
+    // snprintf(reqauth.AuthCode, sizeof(reqauth.AuthCode), "%s", "9DEYFJ0E8189C29C");
+    snprintf(reqauth.AppID, sizeof(reqauth.AppID), "%s", "client_9030001896_v1");
+    snprintf(reqauth.AuthCode, sizeof(reqauth.AuthCode), "%s", "AQ1963JWQ6ATP9FE");
 
     printf("Get Auth...\n");
     int result = user_api_->ReqAuthenticate(&reqauth, ++request_id_);

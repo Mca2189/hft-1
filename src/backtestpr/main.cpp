@@ -1,9 +1,10 @@
-#include <libconfig.h++>
 #include <unordered_map>
 #include <map>
 #include <utility>
 #include <string>
 #include <vector>
+
+#include <libconfig.h++>
 
 #include "core/backtester.h"
 #include "util/ThreadPool.h"
@@ -126,7 +127,7 @@ int main() {
   auto file_v = GetBacktestFile();
   PrintMap(file_v);
   ThreadPool pool(6);
-  for (auto i: file_v) {
+  for (auto i : file_v) {
     pool.enqueue(RunBacktest, i.first, i.second);
   }
 }

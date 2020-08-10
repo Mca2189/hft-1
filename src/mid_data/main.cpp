@@ -1,15 +1,16 @@
 #include <string.h>
 #include <stdio.h>
-#include <zmq.hpp>
-#include <util/zmq_recver.hpp>
-#include <util/zmq_sender.hpp>
-#include <struct/market_snapshot.h>
+#include <cstdlib>
 
 #include <iostream>
 #include <fstream>
-#include <cstdlib>
 #include <vector>
 #include <string>
+
+#include <zmq.hpp>
+#include "util/zmq_recver.hpp"
+#include "util/zmq_sender.hpp"
+#include "struct/market_snapshot.h"
 
 int main() {
   ZmqRecver<MarketSnapshot> recver("data_source");
