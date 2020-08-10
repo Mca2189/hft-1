@@ -1,12 +1,5 @@
 #include <string.h>
 #include <stdio.h>
-#include <zmq.hpp>
-#include <struct/order.h>
-#include <util/zmq_recver.hpp>
-#include <util/zmq_sender.hpp>
-#include <struct/market_snapshot.h>
-#include <util/common_tools.h>
-#include <core/base_strategy.h>
 #include <unordered_map>
 
 #include <iostream>
@@ -15,7 +8,15 @@
 #include <vector>
 #include <string>
 
-#include "simplemaker/strategy.h"
+#include <zmq.hpp>
+#include "struct/order.h"
+#include "util/zmq_recver.hpp"
+#include "util/zmq_sender.hpp"
+#include "struct/market_snapshot.h"
+#include "util/common_tools.h"
+#include "core/base_strategy.h"
+
+#include "./strategy.h"
 
 void HandleLeft() {
 }

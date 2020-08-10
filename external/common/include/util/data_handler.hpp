@@ -111,7 +111,7 @@ class DataHandler {
   T temp_shot;
   std::unordered_map<std::string, T> last_map;
   std::unordered_map<std::string, std::vector<T> > all;
-  std::unordered_map<std::string, int> index_count;
+  std::unordered_map<std::string, size_t> index_count;
   TimeController tc;
 };
 

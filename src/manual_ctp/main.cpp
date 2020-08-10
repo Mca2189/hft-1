@@ -1,17 +1,17 @@
 #include <stdio.h>
 
-#include <struct/order.h>
-#include <struct/exchange_info.h>
-#include <struct/order_side.h>
-#include <struct/offset.h>
-#include <struct/order_action.h>
-
-#include <util/zmq_sender.hpp>
-#include <util/zmq_recver.hpp>
-
 #include <thread>
 #include <iostream>
 #include <string>
+
+#include "struct/order.h"
+#include "struct/exchange_info.h"
+#include "struct/order_side.h"
+#include "struct/offset.h"
+#include "struct/order_action.h"
+
+#include "util/zmq_sender.hpp"
+#include "util/zmq_recver.hpp"
 
 void RunSend(ZmqSender<Order> * sender) {
   int count = 0;
@@ -34,7 +34,7 @@ void RunSend(ZmqSender<Order> * sender) {
       std::cout << "side:(1-buy, 2-sell)";
       std::getline(std::cin, buffer);
       int side_int = atoi(buffer.c_str());
-      if (side_int != 1 and side_int != 2) {
+      if (side_int != 1 && side_int != 2) {
         cout << "wrong side, 1->buy 2->sell!" << endl;
         continue;
       }
@@ -66,7 +66,7 @@ void RunSend(ZmqSender<Order> * sender) {
       std::getline(std::cin, order_ref);
       Order* o = new Order;
       o->action = OrderAction::CancelOrder;
-      strncpy(o->order_ref, order_ref.c_str(), sizeof(o->order_ref));
+      snprintf(o->order_ref, sizeof(o->order_ref), "%s", order_ref.c_str());
       snprintf(o->ticker, sizeof(o->ticker), "%s", ticker.c_str());
       gettimeofday(&o->send_time, nullptr);
       sender->Send(*o);

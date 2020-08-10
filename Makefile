@@ -1,4 +1,4 @@
-WAF = backend/tools/waf
+WAF = backend/tools/waf-light
 
 all:
 	$(WAF) configure all $(PARAMS)

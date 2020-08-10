@@ -1,15 +1,16 @@
 #ifndef SRC_ORDER_MATCHER_ORDER_HANDLER_H_
 #define SRC_ORDER_MATCHER_ORDER_HANDLER_H_
 
-#include <struct/order_side.h>
-#include <struct/order.h>
 #include <unordered_map>
-#include <util/common_tools.h>
-
-#include <libconfig.h++>
 
 #include <stdexcept>
 #include <string>
+
+#include <libconfig.h++>
+
+#include "struct/order_side.h"
+#include "struct/order.h"
+#include "util/common_tools.h"
 
 class OrderHandler {
  public:

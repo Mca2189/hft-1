@@ -1,16 +1,17 @@
 #include <ThostFtdcMdApi.h>
 #include <stdlib.h>
-#include <util/zmq_sender.hpp>
-#include <util/shm_worker.hpp>
 #include <sys/time.h>
 #include <unordered_map>
-#include <struct/market_snapshot.h>
-#include <util/common_tools.h>
 
 #include <string>
 #include <ctime>
 #include <vector>
 #include <fstream>
+
+#include "util/zmq_sender.hpp"
+#include "util/shm_worker.hpp"
+#include "struct/market_snapshot.h"
+#include "util/common_tools.h"
 
 class Listener : public CThostFtdcMdSpi {
  public:
@@ -106,9 +107,7 @@ class Listener : public CThostFtdcMdSpi {
       return;
     }
 
-    strncpy(snapshot.ticker,
-            our_id.c_str(),
-            sizeof(snapshot.ticker));
+    snprintf(snapshot.ticker, sizeof(snapshot.ticker), "%s", our_id.c_str());
 
     snapshot.is_trade_update = false;
     snapshot.last_trade = market_data->LastPrice;
@@ -161,9 +160,9 @@ class Listener : public CThostFtdcMdSpi {
     CThostFtdcReqUserLoginField request;
     memset(&request, 0, sizeof(request));
 
-    strncpy(request.BrokerID, broker_id_.c_str(), sizeof(request.BrokerID));
-    strncpy(request.UserID, user_id_.c_str(), sizeof(request.UserID));
-    strncpy(request.Password, password_.c_str(), sizeof(request.Password));
+    snprintf(request.BrokerID, sizeof(request.BrokerID), "%s", broker_id_.c_str());
+    snprintf(request.UserID, sizeof(request.UserID), "%s", user_id_.c_str());
+    snprintf(request.Password, sizeof(request.Password), "%s", password_.c_str());
 
     int result = user_api_->ReqUserLogin(&request, ++request_id_);
     printf("Logging in as %s\n", user_id_.c_str());

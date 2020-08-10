@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <zmq.hpp>
 #include <ThostFtdcTraderApi.h>
 #include <unordered_map>
 
@@ -8,6 +7,7 @@
 #include <vector>
 #include <memory>
 
+#include <zmq.hpp>
 #include "util/dater.h"
 #include "util/contract_worker.h"
 #include "util/zmq_recver.hpp"
@@ -22,7 +22,7 @@ bool enable_file = true;
 
 std::unordered_map<std::string, std::string> RegisterExchange() {
   std::unordered_map<std::string, std::vector<std::string> > exchange_ticker;
-  exchange_ticker["SHFE"] = {"cu", "ni", "au"};
+  exchange_ticker["SHFE"] = {"cu", "ni", "au", "sn"};
   exchange_ticker["CFFEX"] = {"IH", "IC", "IF", "T"};
   exchange_ticker["CZCE"] = {};
   exchange_ticker["DCE"] = {};

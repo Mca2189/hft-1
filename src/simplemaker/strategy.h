@@ -1,20 +1,21 @@
 #ifndef SRC_SIMPLEMAKER_STRATEGY_H_
 #define SRC_SIMPLEMAKER_STRATEGY_H_
 
-#include <struct/market_snapshot.h>
-#include <struct/strategy_status.h>
-#include <util/time_controller.h>
-#include <struct/order.h>
-#include <util/zmq_sender.hpp>
-#include <struct/exchange_info.h>
-#include <struct/order_status.h>
-#include <util/common_tools.h>
-#include <core/base_strategy.h>
 #include <unordered_map>
 
 #include <cmath>
 #include <vector>
 #include <string>
+
+#include "struct/market_snapshot.h"
+#include "struct/strategy_status.h"
+#include "util/time_controller.h"
+#include "struct/order.h"
+#include "util/zmq_sender.hpp"
+#include "struct/exchange_info.h"
+#include "struct/order_status.h"
+#include "util/common_tools.h"
+#include "core/base_strategy.h"
 
 
 class Strategy : public BaseStrategy {
@@ -25,6 +26,7 @@ class Strategy : public BaseStrategy {
   void Start() override;
   void Stop() override;
   void Flatting() override;
+
  private:
   void DoOperationAfterUpdatePos(Order* o, const ExchangeInfo& info) override;
   void DoOperationAfterUpdateData(const MarketSnapshot& shot) override;

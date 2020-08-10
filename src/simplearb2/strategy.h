@@ -1,7 +1,6 @@
 #ifndef SRC_SIMPLEARB2_STRATEGY_H_
 #define SRC_SIMPLEARB2_STRATEGY_H_
 
-#include <libconfig.h++>
 #include <unordered_map>
 
 #include <cmath>
@@ -10,6 +9,8 @@
 #include <iostream>
 #include <deque>
 #include <memory>
+
+#include <libconfig.h++>
 
 #include "struct/market_snapshot.h"
 #include "struct/strategy_status.h"

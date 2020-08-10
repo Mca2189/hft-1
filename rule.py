@@ -12,6 +12,7 @@ def options(opt):
   opt.load('compiler_cxx')
 
 def configure(conf):
+  from waflib import Task, Context
   Copy()
   conf.load('defaults')
   conf.load('compiler_c')
@@ -122,7 +123,7 @@ def build(bld):
     run_simdata(bld)
     return
   else:
-    print "error! " + str(bld.cmd)
+    print("error! ", str(bld.cmd))
     return
 
 def run_ctpdata(bld):

@@ -379,8 +379,15 @@ void Listener::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* investo
     return;
   }
 
-  // printf("%s, Ydposition is %d, position is %d, positioncost is %lf, opencost is %lf\n", investor_position->InstrumentID, investor_position->YdPosition, investor_position->Position, investor_position->PositionCost, investor_position->OpenCost);
-  // std::cout << investor_position->InstrumentID << " Ydposition is " << investor_position->InstrumentID <<" position is  " << investor_position->Position << " positioncost is " << investor_position->PositionCost << " opencost is " << investor_position->OpenCost << endl;
+  //  printf("%s, Ydposition is %d, position is %d, positioncost is %lf,
+              // opencost is %lf\n", investor_position->InstrumentID,
+              // investor_position->YdPosition, investor_position->Position,
+              // investor_position->PositionCost, investor_position->OpenCost);
+  //  std::cout << investor_position->InstrumentID << " Ydposition is " <<
+               // investor_position->InstrumentID <<" position is  " <<
+               // investor_position->Position << " positioncost is " <<
+               // investor_position->PositionCost << " opencost is " <<
+               // investor_position->OpenCost << endl;
 
   if (investor_position) {
     bool result = true;
@@ -400,8 +407,11 @@ void Listener::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* investo
       ExchangeInfo info;
       gettimeofday(&info.show_time, NULL);
       snprintf(info.ticker, sizeof(info.ticker), "%s", symbol.c_str());
-      // info.trade_price = (investor_position->PositionCost*investor_position->YdPosition + investor_position->OpenCost*investor_position->Position) / (investor_position->Position+investor_position->YdPosition);
-      double contract_size =cw->GetConSize(symbol);
+      // info.trade_price = (investor_position->PositionCost*
+                            // investor_position->YdPosition + investor_position->OpenCost
+                           // *investor_position->Position) / (investor_position->Position
+                            // +investor_position->YdPosition);
+      double contract_size = cw->GetConSize(symbol);
       if (investor_position->YdPosition > 0 && investor_position->PositionCost > 0.1) {
         t_m->RegisterYesToken(symbol, investor_position->YdPosition, side);
         info.trade_size = (investor_position->PosiDirection == THOST_FTDC_PD_Long)?investor_position->YdPosition:-investor_position->YdPosition;
@@ -422,7 +432,10 @@ void Listener::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField* investo
       info.type = InfoType::Position;
       SendExchangeInfo(info);
       info.Show(stdout);
-      // printf("opencost is %lf, openamount is %lf marginrate is %lf %lf\n", investor_position->OpenCost, investor_position->OpenAmount, investor_position->MarginRateByMoney, investor_position->MarginRateByVolume);
+      // printf("opencost is %lf, openamount is %lf marginrate is %lf %lf\n",
+               // investor_position->OpenCost, investor_position->OpenAmount,
+               // investor_position->MarginRateByMoney,
+               // investor_position->MarginRateByVolume);
     }
   }
 
