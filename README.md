@@ -10,12 +10,14 @@
   based on centos 6.5 or 7 (other system have not been tested)
 * IDE recommendation:
   I developed it by vim (using some cool plugin), i also set the neccessary config file for QT, so this can be opened on QT directly.
-* Complie Tools
-  based on g++, using the complie tools waf(python 2 is must, 3 will be crashed!!!!!!), the binary file is included in the repository, path hft/backend/bin/waf, for waf, you can google it
+* Complie Tools:
+  based on g++, using the complie tools waf, the binary file is included in the repository, path hft/backend/bin/waf, for waf, you can google it
 * pre-installed software:
   this project used zeromq to do ipc, version 4.1.2
 * complie command:
   in the path of yourhomepath/hft, run "make", you will get binary file in build/bin
+  
+### warning(using waf:python 2 is a must now, 3 will be crashed!!!!!!) ###
   
 ### Have a quick view ###
 * How to run it
