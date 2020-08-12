@@ -36,6 +36,9 @@ simplearb:
 simplearb2:
 	$(WAF) configure simplearb2 $(PARAMS)
 
+coinarb:
+	$(WAF) configure coinarb $(PARAMS)
+
 pairtrading:
 	$(WAF) configure pairtrading $(PARAMS)
 

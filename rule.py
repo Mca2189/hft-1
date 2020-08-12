@@ -49,6 +49,8 @@ class simplearb_class(BuildContext):
   cmd = "simplearb"
 class simplearb2_class(BuildContext):
   cmd = "simplearb2"
+class coinarb_class(BuildContext):
+  cmd = "coinarb"
 class pairtrading_class(BuildContext):
   cmd = "pairtrading"
 class backtest_class(BuildContext):
@@ -100,6 +102,9 @@ def build(bld):
     return
   if bld.cmd == "simplearb2":
     run_simplearb2(bld)
+    return
+  if bld.cmd == "coinarb":
+    run_coinarb(bld)
     return
   if bld.cmd == "pairtrading":
     run_pairtrading(bld)
@@ -240,6 +245,20 @@ def run_simplearb2(bld):
     use = 'zmq nick pthread config++ shm' # simplearb'
   )
 
+def run_coinarb(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.program(
+    target = 'bin/coinarb',
+    source = ['src/coinarb/main.cpp',
+              'src/coinarb/strategy.cpp'
+             ],
+    includes = [
+                'external/zeromq/include'
+               ],
+    use = 'zmq nick pthread config++ shm' # simplearb'
+  )
+
+
 def run_pairtrading(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
   bld.program(
@@ -333,6 +352,7 @@ def run_all(bld):
   run_getins(bld)
   run_simplearb(bld)
   run_simplearb2(bld)
+  run_coinarb(bld)
   run_pairtrading(bld)
   run_backtest(bld)
   run_backtest2(bld)
