@@ -46,6 +46,8 @@ void RunSend(ZmqSender<Order> * sender) {
       int confirmed = atoi(buffer.c_str());
       if (confirmed == 1) {
         Order* o = new Order;
+        gettimeofday(&o->send_time, NULL);
+        gettimeofday(&o->shot_time, NULL);
         o->action = OrderAction::NewOrder;
         snprintf(o->ticker, sizeof(o->ticker), "%s", ticker.c_str());
         o->price = price;
@@ -81,6 +83,7 @@ void RunSend(ZmqSender<Order> * sender) {
 }
 
 void RunRecv(ZmqRecver<ExchangeInfo> * recver) {
+  printf("run recv started\n");
   ExchangeInfo info;
   while (true) {
     recver->Recv(info);
