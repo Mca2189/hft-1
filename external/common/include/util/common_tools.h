@@ -193,6 +193,4 @@ static void RunOrderProxy();
 static void RunExchangeinfoProxy();
 std::vector<std::thread*> run_proxy();
 
-#define RUN_PROXY() 1
-
 #endif // COMMON_TOOLS_H_
