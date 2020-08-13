@@ -28,6 +28,13 @@
 #include <zmq.hpp>
 
 #include "struct/market_snapshot.h"
+#include "util/base_recver.hpp"
+#include "util/base_sender.hpp"
+#include "util/zmq_recver.hpp"
+#include "util/zmq_sender.hpp"
+#include "util/shm_recver.hpp"
+#include "util/shm_sender.hpp"
+
 using namespace std;
 using namespace std::chrono;
 
@@ -193,6 +200,32 @@ static void RunOrderProxy();
 static void RunExchangeinfoProxy();
 std::vector<std::thread*> run_proxy();
 
-#define RUN_PROXY() 1
+template <typename T1, template<typename> class T2>
+BaseSender<T1>* CreateSender(const std::string& mode) {
+  if (mode == "order") {
+    return new T2<T1>("strategy_order", "connect", "ipc", "order.dat");
+  } else if (mode == "data") {
+    return new T2<T1>("external_data", "connect", "ipc");
+  } else if (mode == "exchangeinfo") {
+    return new T2<T1>("external_exchangeinfo", "connect", "ipc");
+  } else {
+    printf("sender unknown mode!%s\n", mode.c_str());
+    return nullptr;
+  }
+}
+
+template <typename T1, template<typename> class T2>
+BaseSender<T1>* CreateRecver(const std::string& mode) {
+  if (mode == "order") {
+    return new T2<T1>("external_order");
+  } else if (mode == "data") {
+    return new T2<T1>("strategy_data");
+  } else if (mode == "exchangeinfo") {
+    return new T2<T1>("strategy_exchangeinfo");
+  } else {
+    printf("recver unknown mode!%s\n", mode.c_str());
+    return nullptr;
+  }
+}
 
 #endif // COMMON_TOOLS_H_

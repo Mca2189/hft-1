@@ -247,6 +247,7 @@ def run_simplearb2(bld):
 
 def run_coinarb(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.shlib(target='coin', source='src/coinarb/strategy.cpp')
   bld.program(
     target = 'bin/coinarb',
     source = ['src/coinarb/main.cpp',
@@ -255,7 +256,7 @@ def run_coinarb(bld):
     includes = [
                 'external/zeromq/include'
                ],
-    use = 'zmq nick pthread config++ shm' # simplearb'
+    use = 'zmq nick pthread config++ shm c'
   )
 
 
@@ -319,16 +320,6 @@ def run_order_matcher(bld):
     target = 'bin/order_matcher',
     source = ['src/order_matcher/main.cpp',
               'src/order_matcher/order_handler.cpp'],
-    includes = ['external/zeromq/include'],
-    use = 'zmq nick pthread config++'
-  )
-
-def run_demostrat(bld):
-  bld.read_shlib('nick', paths=['external/common/lib'])
-  bld.program(
-    target = 'bin/demostrat',
-    source = ['src/demostrat/main.cpp',
-              'src/demostrat/strategy.cpp'],
     includes = ['external/zeromq/include'],
     use = 'zmq nick pthread config++'
   )
