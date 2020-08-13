@@ -6,7 +6,7 @@
 
 #include "./strategy.h"
 
-Strategy::Strategy(const libconfig::Setting & param_setting, std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender, TimeController* tc, ContractWorker* cw, HistoryWorker* hw, const std::string & date, StrategyMode::Enum mode, std::ofstream* exchange_file)
+Strategy::Strategy(const libconfig::Setting & param_setting, std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<MarketSnapshot>* uisender, ZmqSender<Order>* ordersender, TimeController* tc, ContractWorker* cw, const std::string & date, StrategyMode::Enum mode, std::ofstream* exchange_file)
   : date_(date),
     max_close_try_(10),
     close_round_(0),
@@ -16,7 +16,6 @@ Strategy::Strategy(const libconfig::Setting & param_setting, std::unordered_map<
     exchange_file_(exchange_file) {
   m_tc = tc;
   m_cw = cw;
-  m_hw = hw;
   // mids_.reserve(30000);
   SetStrategyMode(mode, exchange_file);
   if (FillStratConfig(param_setting)) {
@@ -41,26 +40,27 @@ void Strategy::RunningSetup(std::unordered_map<std::string, std::vector<BaseStra
 }
 
 std::string Strategy::TransCoin(std::string ticker) {
+  printf("passing in %s\n", ticker.c_str());
   std::string date;
   if (ticker.find("this_week") != ticker.npos) {
     date = Dater::get_weekday_string(5);
     date.erase(std::remove(date.begin(), date.end(), '-'), date.end());
-    date = date.substr(date.find("20"));
+    date = date.substr(2, 6);
     return ticker.replace(ticker.find("this_week"), sizeof("this_week"), date);
   } else if (ticker.find("next_week") != ticker.npos) {
     date = Dater::get_next_weekday_string(5);
     date.erase(std::remove(date.begin(), date.end(), '-'), date.end());
-    date = date.substr(date.find("20"));
+    date = date.substr(2, 6);
     return ticker.replace(ticker.find("next_week"), sizeof("next_week"), date);
   } else if (ticker.find("this_quarter") != ticker.npos) {
     date = Dater::get_quarter_lastday_string(5);
     date.erase(std::remove(date.begin(), date.end(), '-'), date.end());
-    date = date.substr(date.find("20"));
+    date = date.substr(2, 6);
     return ticker.replace(ticker.find("this_quarter"), sizeof("this_quarter"), date);
   } else if (ticker.find("next_quarter") != ticker.npos) {
     date = Dater::get_next_quarter_lastday_string(5);
     date.erase(std::remove(date.begin(), date.end(), '-'), date.end());
-    date = date.substr(date.find("20"));
+    date = date.substr(2, 6);
     return ticker.replace(ticker.find("next_quarter"), sizeof("next_quarter"), date);
   }
   return ticker;
@@ -69,21 +69,25 @@ std::string Strategy::TransCoin(std::string ticker) {
 bool Strategy::FillStratConfig(const libconfig::Setting& param_setting) {
   try {
     std::string unique_name = param_setting["unique_name"];
-    const libconfig::Setting & contract_setting = m_cw->Lookup(unique_name);
     m_strat_name = unique_name;
     const libconfig::Setting& pairs = param_setting["pairs"];
     const std::string& main_ticker = pairs[0];
     const std::string& hedge_ticker = pairs[1];
-    main_ticker_ = main_ticker;
-    hedge_ticker_ = hedge_ticker;
-    raw_main_ = TransCoin(main_ticker_);
-    raw_hedge_ = TransCoin(hedge_ticker_);
-    hedge_ticker_ = hedge_ticker;
+    raw_main_ = main_ticker;
+    raw_hedge_ = hedge_ticker;
+    main_ticker_ = TransCoin(raw_main_);
+    hedge_ticker_ = TransCoin(raw_hedge_);
+    printf("main=%s, hedge=%s\n", raw_main_.c_str(), raw_hedge_.c_str());
+    printf("main_ticker=%s, hedge_ticker=%s\n", main_ticker_.c_str(), hedge_ticker_.c_str());
+    const libconfig::Setting & main_contract_setting = m_cw->Lookup(raw_main_);
+    const libconfig::Setting & hedge_contract_setting = m_cw->Lookup(raw_hedge_);
     max_pos_ = param_setting["max_position"];
     train_samples_ = param_setting["train_samples"];
     double m_r = param_setting["min_range"];
     double m_p = param_setting["min_profit"];
-    min_price_move_ = contract_setting["min_price_move"];
+    double min_price_move_main = main_contract_setting["min_price_move"];
+    double min_price_move_hedge = hedge_contract_setting["min_price_move"];
+    min_price_move_ = std::max(min_price_move_main, min_price_move_hedge);
     min_profit_ = m_p * min_price_move_;
     min_range_ = m_r * min_price_move_;
     double spread_threshold_int = param_setting["spread_threshold"];
@@ -91,7 +95,9 @@ bool Strategy::FillStratConfig(const libconfig::Setting& param_setting) {
     m_max_holding_sec = param_setting["max_holding_sec"];
     range_width_ = param_setting["range_width"];
     std::string con = GetCon(main_ticker_);
-    cancel_limit_ = contract_setting["cancel_limit"];
+    int main_cancel_limit_ = main_contract_setting["cancel_limit"];
+    int hedge_cancel_limit_ = hedge_contract_setting["cancel_limit"];
+    cancel_limit_ = std::min(main_cancel_limit_, hedge_cancel_limit_);
     max_round_ = param_setting["max_round"];
     if (param_setting.exists("no_close_today")) {
       no_close_today_ = param_setting["no_close_today"];
@@ -239,20 +245,24 @@ void Strategy::Open(OrderSide::Enum side) {
 
 bool Strategy::OpenLogic() {
   if (abs(m_position_map[main_ticker_]) >= max_pos_ || !m_order_map.empty()) {
+    // printf("block order exsited! no open \n");
+    // PrintMap(m_order_map);
     return false;
   }
   auto main_shot = m_shot_map[main_ticker_];
   auto hedge_shot = m_shot_map[hedge_ticker_];
   if (main_shot.asks[0] - hedge_shot.asks[0] >= up_diff_) {  // sell at high price
-    if (hedge_shot.ask_sizes[0] < 5) {  // filter those too thin oppounity
+    printf("[%s %s]sell open, as %lf-%lf>= %lf, %d\n", main_ticker_.c_str(), hedge_ticker_.c_str(), main_shot.asks[0], hedge_shot.asks[0], up_diff_, hedge_shot.ask_sizes[0]);
+    if (hedge_shot.ask_sizes[0] < 1) {  // filter those too thin oppounity
       return false;
     }
-    PlaceOrder(main_ticker_, main_shot.asks[0], -1, no_close_today_, "open")->Show(stdout);
+    PlaceOrder(main_ticker_, main_shot.asks[0]-min_price_move_, -1, no_close_today_, "open")->Show(stdout);
   } else if (main_shot.bids[0] - hedge_shot.bids[0] <= down_diff_) {  // buy at low price
-    if (hedge_shot.bid_sizes[0] < 5) {  // filter those too thin oppounity
+    printf("[%s %s]buy open, as %lf-%lf<= %lf, %d\n", main_ticker_.c_str(), hedge_ticker_.c_str(), main_shot.bids[0], hedge_shot.bids[0], down_diff_, hedge_shot.bid_sizes[0]);
+    if (hedge_shot.bid_sizes[0] < 1) {  // filter those too thin oppounity
       return false;
     }
-    PlaceOrder(main_ticker_, main_shot.bids[0], 1, no_close_today_, "open")->Show(stdout);
+    PlaceOrder(main_ticker_, main_shot.bids[0]+min_price_move_, 1, no_close_today_, "open")->Show(stdout);
   } else {
     return false;
   }
@@ -296,7 +306,9 @@ void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
   current_spread_ = m_shot_map[main_ticker_].asks[0] - m_shot_map[main_ticker_].bids[0];
   if (IsAlign()) {  // && Spread_Good()) {
     mids_.push_back(GetMid(main_ticker_) - GetMid(hedge_ticker_));
-    printf("[%s %s]mid_diff=%lf, head:%d, tail:%d\n", main_ticker_.c_str(), hedge_ticker_.c_str(), mids_.back(), sample_head_, sample_tail_);
+    if (mids_.size() % 300 == 0) {
+      printf("[%s %s]mid_diff=%lf, head:%d, tail:%d\n", main_ticker_.c_str(), hedge_ticker_.c_str(), mids_.back(), sample_head_, sample_tail_);
+    }
     if (++ sample_tail_ - sample_head_ > train_samples_) {
       UpdateParams("[tail-head hit]");
     }
@@ -329,9 +341,11 @@ void Strategy::ModerateOrders(const std::string & ticker) {
       if ((o->side == OrderSide::Buy && o->price - reasonable_price >= min_price_move_ / 2)  //  buy, order price > reasonable buy price, loss
        || (o->side == OrderSide::Sell && o->price - reasonable_price <= min_price_move_ / 2)) {  // sell, order price < reasonable sell
         CancelOrder(o);
+        o->Show(stdout);
       }
     } else if (o->ticker == hedge_ticker_) {
       ModOrder(o);
+      o->Show(stdout);
     } else {
       continue;
     }

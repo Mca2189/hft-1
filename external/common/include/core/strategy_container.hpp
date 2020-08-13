@@ -18,8 +18,9 @@ using namespace std;
 template<template<typename> class T>
 class StrategyContainer {
  public:
-  StrategyContainer(unordered_map<string, vector<BaseStrategy*> > &m)
+  StrategyContainer(unordered_map<string, vector<BaseStrategy*> > &m, bool debug_mode = false)
     : m(m),
+      debug_mode_(debug_mode),
       marketdata_recver(new T<MarketSnapshot>("strategy_data")),
       exchangeinfo_recver(new T<ExchangeInfo>("strategy_exchangeinfo")),
       command_recver(new ZmqRecver<Command>("*:33334", "tcp", "bind")) {
@@ -36,10 +37,10 @@ class StrategyContainer {
     // thread exchangeinfo_proxy_thread(RunExchangeinfoProxy);
     thread command_thread(RunCommandListener, std::ref(m), command_recver.get());
     thread exchangeinfo_thread(RunExchangeListener, std::ref(m), exchangeinfo_recver.get());
-    thread marketdata_thread(RunMarketDataListener, std::ref(m), marketdata_recver.get());
     // data_proxy_thread.join();
     // order_proxy_thread.join();
     // exchangeinfo_proxy_thread.join();
+    thread marketdata_thread(RunMarketDataListener, std::ref(m), marketdata_recver.get(), debug_mode_);
     command_thread.join();
     exchangeinfo_thread.join();
     marketdata_thread.join();
@@ -76,11 +77,15 @@ class StrategyContainer {
     }
   }
 
-  static void RunMarketDataListener(unordered_map<string, vector<BaseStrategy*> > &m, T<MarketSnapshot> * marketdata_recver) {
+  static void RunMarketDataListener(unordered_map<string, vector<BaseStrategy*> > &m, T<MarketSnapshot> * marketdata_recver, bool debug_mode) {
+    int count = 0;
     while (true) {
       MarketSnapshot shot;
       marketdata_recver->Recv(shot);
       auto sv = m[shot.ticker];
+      if (debug_mode && count++ < 1000) {
+        shot.Show(stdout);
+      }
       for (auto s : sv) {
         s->UpdateData(shot);
       }
@@ -88,6 +93,7 @@ class StrategyContainer {
   }
 
   unordered_map<string, vector<BaseStrategy*> > &m;
+  bool debug_mode_;
   unique_ptr<T<MarketSnapshot> > marketdata_recver;
   unique_ptr<T<ExchangeInfo> > exchangeinfo_recver;
   unique_ptr<ZmqRecver<Command> > command_recver;
