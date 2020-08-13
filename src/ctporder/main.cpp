@@ -38,7 +38,7 @@ std::unordered_map<std::string, std::string> RegisterExchange() {
 
 void* RunOrderCommandListener(void *param) {
   MessageSender* message_sender = reinterpret_cast<MessageSender*>(param);
-  auto r = new ZmqRecver<Order>("order_recver");
+  auto r = new ZmqRecver<Order>("external_order");
   std::shared_ptr<ZmqSender<Order> > sender(new ZmqSender<Order>("*:33335", "bind", "tcp"));
   while (true) {
     Order o;
@@ -100,7 +100,7 @@ int main() {
   std::string default_path = GetDefaultPath();
   std::string contract_config_path = default_path + "/hft/config/contract/bk_contract.config";
   ContractWorker cw(contract_config_path);
-  Listener listener("exchange_info",
+  Listener listener("external_exchangeinfo",
                     &message_sender,
                     "error_list",
                     &order_id_map,

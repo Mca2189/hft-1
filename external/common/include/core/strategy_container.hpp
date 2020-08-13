@@ -20,8 +20,8 @@ class StrategyContainer {
  public:
   StrategyContainer(unordered_map<string, vector<BaseStrategy*> > &m)
     : m(m),
-      marketdata_recver(new T<MarketSnapshot>("data_recver")),
-      exchangeinfo_recver(new T<ExchangeInfo>("exchange_info")),
+      marketdata_recver(new T<MarketSnapshot>("strategy_data")),
+      exchangeinfo_recver(new T<ExchangeInfo>("strategy_exchangeinfo")),
       command_recver(new ZmqRecver<Command>("*:33334", "tcp", "bind")) {
 
 }
@@ -30,13 +30,21 @@ class StrategyContainer {
   virtual ~StrategyContainer() {
   }
   void Start() {
+    run_proxy();
+    // thread data_proxy_thread(RunDataProxy);
+    // thread order_proxy_thread(RunOrderProxy);
+    // thread exchangeinfo_proxy_thread(RunExchangeinfoProxy);
     thread command_thread(RunCommandListener, std::ref(m), command_recver.get());
     thread exchangeinfo_thread(RunExchangeListener, std::ref(m), exchangeinfo_recver.get());
     thread marketdata_thread(RunMarketDataListener, std::ref(m), marketdata_recver.get());
+    // data_proxy_thread.join();
+    // order_proxy_thread.join();
+    // exchangeinfo_proxy_thread.join();
     command_thread.join();
     exchangeinfo_thread.join();
     marketdata_thread.join();
   }
+
  private:
   static void RunCommandListener(unordered_map<string, vector<BaseStrategy*> > &m, ZmqRecver<Command>* command_recver) {
     while (true) {

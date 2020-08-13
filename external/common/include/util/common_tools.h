@@ -25,6 +25,8 @@
 #include <chrono>
 #include <thread>
 
+#include <zmq.hpp>
+
 #include "struct/market_snapshot.h"
 using namespace std;
 using namespace std::chrono;
@@ -186,4 +188,8 @@ std::tuple<double, double> CalMeanStd(const T & v, int head, int num) {
 
 double RoundPrice(double price, double min_price, int size = 1);
 
+static void RunDataProxy();
+static void RunOrderProxy();
+static void RunExchangeinfoProxy();
+void run_proxy();
 #endif // COMMON_TOOLS_H_
