@@ -68,9 +68,12 @@ int main() {
   CThostFtdcTraderApi* user_api = CThostFtdcTraderApi::CreateFtdcTraderApi();
 
   std::string broker = "9999";
+  std::string username = "115686";
+  std::string password = "fz567789";
+  /*
+  std::string broker = "9999";
   std::string username = "116909";
   std::string password = "yifeng";
-  /*
   std::string broker = "1025";
   std::string username = "920207";
   std::string password = "584hxy..";
@@ -80,9 +83,6 @@ int main() {
   std::string broker = "1025";
   std::string username = "920207";
   std::string password = "584hxy..";
-  std::string broker = "9999";
-  std::string username = "115686";
-  std::string password = "fz567789";
   */
   ::unordered_map<int, int> order_id_map;
 

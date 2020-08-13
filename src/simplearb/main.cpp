@@ -39,7 +39,7 @@ int main() {
   TimeController tc(time_config_path);
 
   std::unique_ptr<ZmqSender<MarketSnapshot> > ui_sender(new ZmqSender<MarketSnapshot>("*:33333", "bind", "tcp", "mid.dat"));
-  std::unique_ptr<ZmqSender<Order> > order_sender(new ZmqSender<Order>("order_sender", "connect", "ipc", "order.dat"));
+  std::unique_ptr<ZmqSender<Order> > order_sender(new ZmqSender<Order>("strategy_order", "connect", "ipc", "order.dat"));
   // std::unique_ptr<Sender<Order> > order_sender(new ZmqSender<Order>("order_recver", 100000, "order.dat"));
 
   std::unordered_map<std::string, std::vector<BaseStrategy*> > ticker_strat_map;

@@ -31,7 +31,7 @@ class StrategyContainer {
   virtual ~StrategyContainer() {
   }
   void Start() {
-    run_proxy();
+    auto v = run_proxy();
     // thread data_proxy_thread(RunDataProxy);
     // thread order_proxy_thread(RunOrderProxy);
     // thread exchangeinfo_proxy_thread(RunExchangeinfoProxy);
@@ -41,6 +41,9 @@ class StrategyContainer {
     // order_proxy_thread.join();
     // exchangeinfo_proxy_thread.join();
     thread marketdata_thread(RunMarketDataListener, std::ref(m), marketdata_recver.get(), debug_mode_);
+    for (auto i : v) {
+      i->join();
+    }
     command_thread.join();
     exchangeinfo_thread.join();
     marketdata_thread.join();

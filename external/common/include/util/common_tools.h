@@ -191,5 +191,8 @@ double RoundPrice(double price, double min_price, int size = 1);
 static void RunDataProxy();
 static void RunOrderProxy();
 static void RunExchangeinfoProxy();
-void run_proxy();
+std::vector<std::thread*> run_proxy();
+
+#define RUN_PROXY() 1
+
 #endif // COMMON_TOOLS_H_
