@@ -31,7 +31,7 @@ class Listener : public CThostFtdcMdSpi {
       record_binary(binary_record),
       record_stdout(show_stdout),
       record_file(file_record) {
-    sender = new ZmqSender<MarketSnapshot> ("external_data", "connect");
+    sender = CreateSender<ZmqSender, MarketSnapshot>("data").get();
     time_t time_seconds = time(0);
     struct tm now_time;
     localtime_r(&time_seconds, &now_time);
@@ -240,7 +240,7 @@ class Listener : public CThostFtdcMdSpi {
   bool record_file;
   std::ofstream binary_file;
   // ZmqSender* sender;
-  ZmqSender<MarketSnapshot> * sender;
+  BaseSender<MarketSnapshot> * sender;
 };
 
 int main() {

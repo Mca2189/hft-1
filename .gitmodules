@@ -1,3 +1,6 @@
 [submodule "lib-hft"]
 	path = lib-hft
 	url = git@github.com:nickhuangxinyu/lib-hft.git
+[submodule "strategy"]
+	path = strategy
+	url = git@github.com:nickhuangxinyu/strategy.git

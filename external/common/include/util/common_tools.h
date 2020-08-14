@@ -200,32 +200,38 @@ static void RunOrderProxy();
 static void RunExchangeinfoProxy();
 std::vector<std::thread*> run_proxy();
 
-template <typename T1, template<typename> class T2>
-BaseSender<T1>* CreateSender(const std::string& mode) {
+template <template<typename> class T1, typename T2>
+std::unique_ptr<BaseSender<T2> > CreateSender(const std::string& mode) {
   if (mode == "order") {
-    return new T2<T1>("strategy_order", "connect", "ipc", "order.dat");
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("strategy_order", "connect", "ipc", "order.dat"));
   } else if (mode == "data") {
-    return new T2<T1>("external_data", "connect", "ipc");
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("external_data", "connect", "ipc"));
   } else if (mode == "exchangeinfo") {
-    return new T2<T1>("external_exchangeinfo", "connect", "ipc");
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("external_exchangeinfo", "connect", "ipc", "exchange.dat"));
+  } else if (mode == "ui") {
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("*:33333", "bind", "tcp", "mid.dat"));
+  } else if (mode == "command") {
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("*:33335", "bind", "tcp"));
   } else {
     printf("sender unknown mode!%s\n", mode.c_str());
-    return nullptr;
   }
+  return nullptr;
 }
 
-template <typename T1, template<typename> class T2>
-BaseSender<T1>* CreateRecver(const std::string& mode) {
+template <template<typename> class T1, typename T2>
+std::unique_ptr<BaseRecver<T2> > CreateRecver(const std::string& mode) {
   if (mode == "order") {
-    return new T2<T1>("external_order");
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("external_order"));
   } else if (mode == "data") {
-    return new T2<T1>("strategy_data");
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("strategy_data"));
   } else if (mode == "exchangeinfo") {
-    return new T2<T1>("strategy_exchangeinfo");
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("strategy_exchangeinfo"));
+  } else if (mode == "command") {
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("*:33334", "tcp", "bind"));
   } else {
     printf("recver unknown mode!%s\n", mode.c_str());
-    return nullptr;
   }
+  return nullptr;
 }
 
 #endif // COMMON_TOOLS_H_

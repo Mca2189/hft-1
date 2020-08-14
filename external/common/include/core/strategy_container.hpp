@@ -21,9 +21,9 @@ class StrategyContainer {
   StrategyContainer(unordered_map<string, vector<BaseStrategy*> > &m, bool debug_mode = false)
     : m(m),
       debug_mode_(debug_mode),
-      marketdata_recver(new T<MarketSnapshot>("strategy_data")),
-      exchangeinfo_recver(new T<ExchangeInfo>("strategy_exchangeinfo")),
-      command_recver(new ZmqRecver<Command>("*:33334", "tcp", "bind")) {
+      marketdata_recver(CreateRecver<T, MarketSnapshot>("data")),
+      exchangeinfo_recver(CreateRecver<T, ExchangeInfo>("strategy_exchangeinfo")),
+      command_recver(CreateRecver<T, Command>("command")) {
 
 }
   // explicit StrategyContainer(const StrategyContainer& sc) {}  // unable copy constructor
@@ -50,7 +50,7 @@ class StrategyContainer {
   }
 
  private:
-  static void RunCommandListener(unordered_map<string, vector<BaseStrategy*> > &m, ZmqRecver<Command>* command_recver) {
+  static void RunCommandListener(unordered_map<string, vector<BaseStrategy*> > &m, BaseRecver<Command>* command_recver) {
     while (true) {
       Command shot;
       command_recver->Recv(shot);
@@ -68,7 +68,7 @@ class StrategyContainer {
     }
   }
 
-  static void RunExchangeListener(unordered_map<string, vector<BaseStrategy*> > &m, T<ExchangeInfo>* exchangeinfo_recver) {
+  static void RunExchangeListener(unordered_map<string, vector<BaseStrategy*> > &m, BaseRecver<ExchangeInfo>* exchangeinfo_recver) {
     while (true) {
       ExchangeInfo info;
       exchangeinfo_recver->Recv(info);
@@ -80,7 +80,7 @@ class StrategyContainer {
     }
   }
 
-  static void RunMarketDataListener(unordered_map<string, vector<BaseStrategy*> > &m, T<MarketSnapshot> * marketdata_recver, bool debug_mode) {
+  static void RunMarketDataListener(unordered_map<string, vector<BaseStrategy*> > &m, BaseRecver<MarketSnapshot> * marketdata_recver, bool debug_mode) {
     int count = 0;
     while (true) {
       MarketSnapshot shot;
@@ -97,9 +97,9 @@ class StrategyContainer {
 
   unordered_map<string, vector<BaseStrategy*> > &m;
   bool debug_mode_;
-  unique_ptr<T<MarketSnapshot> > marketdata_recver;
-  unique_ptr<T<ExchangeInfo> > exchangeinfo_recver;
-  unique_ptr<ZmqRecver<Command> > command_recver;
+  unique_ptr<BaseRecver<MarketSnapshot> > marketdata_recver;
+  unique_ptr<BaseRecver<ExchangeInfo> > exchangeinfo_recver;
+  unique_ptr<BaseRecver<Command> > command_recver;
 };
 
 #endif  // STRATEGY_CONTAINER_HPP_

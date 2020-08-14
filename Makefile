@@ -63,5 +63,23 @@ order_matcher:
 teststrat:
 	$(WAF) configure teststrat $(PARAMS)
 
+lib_simplemaker:
+	$(WAF) configure lib_simplemaker $(PARAMS)
+
+lib_simplearb:
+	$(WAF) configure lib_simplearb $(PARAMS)
+
+lib_simplearb2:
+	$(WAF) configure lib_simplearb2 $(PARAMS)
+
+lib_coinarb:
+	$(WAF) configure lib_coinarb $(PARAMS)
+
+lib_pairtrading:
+	$(WAF) configure lib_pairtrading $(PARAMS)
+
+lib_demostrat:
+	$(WAF) configure lib_demostrat $(PARAMS)
+
 clean:
 	rm -rf build

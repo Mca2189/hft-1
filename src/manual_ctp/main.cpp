@@ -23,7 +23,7 @@ void RunSend(ZmqSender<Order> * sender) {
     std::getline(std::cin, action);
     if (action == "new") {
       std::cout << "ticker:";
-      std::getline(std::cin, buffer);
+      std::getline(std::cin, ticker);
       ticker = buffer;
       std::cout << "price:";
       std::getline(std::cin, buffer);
@@ -66,6 +66,8 @@ void RunSend(ZmqSender<Order> * sender) {
       std::cout << "order_ref:";
       std::string order_ref;
       std::getline(std::cin, order_ref);
+      std::cout << "ticker:";
+      std::getline(std::cin, ticker);
       Order* o = new Order;
       o->action = OrderAction::CancelOrder;
       snprintf(o->order_ref, sizeof(o->order_ref), "%s", order_ref.c_str());
@@ -92,9 +94,13 @@ void RunRecv(ZmqRecver<ExchangeInfo> * recver) {
 }
 
 int main() {
-  std::unique_ptr<ZmqRecver<ExchangeInfo> > exchange_recver(new ZmqRecver<ExchangeInfo>("exchange_info"));
+  std::unique_ptr<ZmqRecver<ExchangeInfo> > exchange_recver(new ZmqRecver<ExchangeInfo>("external_exchangeinfo"));
   std::thread recv_thread(RunRecv, exchange_recver.get());
-  std::unique_ptr<ZmqSender<Order> > order_sender(new ZmqSender<Order>("order_recver"));
+  std::unique_ptr<ZmqSender<Order> > order_sender(new ZmqSender<Order>("strategy_order", "connect", "ipc", "test.dat"));
+  auto v = run_proxy();
   RunSend(order_sender.get());
   recv_thread.join();
+  for (auto i : v) {
+    i->join();
+  }
 }
