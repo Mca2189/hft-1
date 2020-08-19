@@ -12,6 +12,7 @@
 
 #include "util/zmq_sender.hpp"
 #include "util/zmq_recver.hpp"
+#include "util/common_tools.h"
 
 void RunSend(ZmqSender<Order> * sender) {
   int count = 0;
@@ -24,7 +25,6 @@ void RunSend(ZmqSender<Order> * sender) {
     if (action == "new") {
       std::cout << "ticker:";
       std::getline(std::cin, ticker);
-      ticker = buffer;
       std::cout << "price:";
       std::getline(std::cin, buffer);
       double price = atof(buffer.c_str());
@@ -84,7 +84,7 @@ void RunSend(ZmqSender<Order> * sender) {
   exit(1);
 }
 
-void RunRecv(ZmqRecver<ExchangeInfo> * recver) {
+void RunRecv(BaseRecver<ExchangeInfo> * recver) {
   printf("run recv started\n");
   ExchangeInfo info;
   while (true) {
@@ -94,7 +94,8 @@ void RunRecv(ZmqRecver<ExchangeInfo> * recver) {
 }
 
 int main() {
-  std::unique_ptr<ZmqRecver<ExchangeInfo> > exchange_recver(new ZmqRecver<ExchangeInfo>("external_exchangeinfo"));
+  // std::unique_ptr<ZmqRecver<ExchangeInfo> > exchange_recver(new ZmqRecver<ExchangeInfo>("external_exchangeinfo"));
+  auto exchange_recver = CreateRecver<ZmqRecver, ExchangeInfo>("exchangeinfo");
   std::thread recv_thread(RunRecv, exchange_recver.get());
   std::unique_ptr<ZmqSender<Order> > order_sender(new ZmqSender<Order>("strategy_order", "connect", "ipc", "test.dat"));
   auto v = run_proxy();
