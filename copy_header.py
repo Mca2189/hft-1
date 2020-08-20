@@ -37,6 +37,8 @@ def Copy():
       continue
     shutil.copy(header_path+f, target_path)
     print('copying %s to %s' % (header_path+f, target_path))
+  if not os.path.exists("./lib-hft/lib/libnick.so"):
+    return
   shutil.copy("./lib-hft/lib/libnick.so", './external/common/lib')
 
 if __name__ == '__main__':
