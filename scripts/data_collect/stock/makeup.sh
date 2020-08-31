@@ -18,4 +18,5 @@ while [ "$beg_s" -le "$end_s" ];do
     beg_s=$((beg_s+86400));
     ulimit -n 65536
     rsync -avz --ignore-existing -e "ssh -i /root/.ssh/ali_key" -r root@139.196.204.22:/root/huatai/build/stocktick$day.dat.gz /home/nick/stock
+	ssh -i /root/.ssh/ali_key root@139.196.204.22 "rm /root/huatai/build//root/huatai/build/stocktick$day.dat.gz"
 done
