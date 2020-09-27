@@ -40,9 +40,9 @@ class DataTransformer {
 
   void BatchRun();
 
+  static void ReCoding(const std::string & path, const std::string & dest_dir, size_t max_depth = 5);
  private:
   static std::string GenFileName(const std::string & source_path, const std::string & file_name, const std::string & post_prefix);
-  static void ReCoding(const std::string & path, const std::string & dest_dir, size_t max_depth = 5);
   TimeController* tc;
   int cpu_count;
   ThreadPool * pool;

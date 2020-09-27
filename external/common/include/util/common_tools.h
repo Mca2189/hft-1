@@ -234,4 +234,6 @@ std::unique_ptr<BaseRecver<T2> > CreateRecver(const std::string& mode) {
   return nullptr;
 }
 
+bool FileExists(const std::string& file_path);
+
 #endif // COMMON_TOOLS_H_
