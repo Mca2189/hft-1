@@ -21,3 +21,4 @@ external/common/include/*.cpp
 external/common/include/struct/*.cpp
 external/common/include/core/*.cpp
 external/common/include/util/*.cpp
+__pycache__/*
