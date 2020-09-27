@@ -14,6 +14,7 @@
   based on g++, using the complie tools waf, the binary file is included in the repository, path hft/backend/bin/waf, for waf, you can google it
 * pre-installed software:
   this project used zeromq to do ipc, version 4.1.2
+  install.sh and setzeromq.sh will help you to install.
 * complie command:
   in the path of yourhomepath/hft, run "make", you will get binary file in build/bin
   

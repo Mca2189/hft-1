@@ -1,0 +1,3 @@
+rename A B *
+replace filename A with B
+"s/a/b" not support
