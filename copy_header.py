@@ -37,9 +37,18 @@ def Copy():
       continue
     shutil.copy(header_path+f, target_path)
     print('copying %s to %s' % (header_path+f, target_path))
-  if not os.path.exists("./lib-hft/lib/libnick.so"):
+  if not os.path.exists("./lib-hft/make_dir/libnick.so"):
     return
-  shutil.copy("./lib-hft/lib/libnick.so", './external/common/lib')
+  shutil.copy("./lib-hft/make_dir/libnick.so", './external/common/lib')
+
+def Install():
+  if not os.path.exists('./lib-hft'):
+    print("%s not existed!"%('./lib-hft'))
+    return
+  if os.path.getsize('lib-hft') < 100:
+    print('lib-hft size is too small', os.path.getsize('lib-hft'))
+    return
+  os.system('cd lib-hft; cmake .; make install')
 
 if __name__ == '__main__':
-  Copy()
+  Install()

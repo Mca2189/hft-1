@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 
+// #pragma pack(8)
+
 struct MarketSnapshot {
   char ticker[MAX_TICKER_LENGTH];
   double bids[MARKET_DATA_DEPTH];

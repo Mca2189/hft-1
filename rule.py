@@ -13,7 +13,7 @@ def options(opt):
 
 def configure(conf):
   from waflib import Task, Context
-  Copy()
+  Install()
   conf.load('defaults')
   conf.load('compiler_c')
   conf.load('compiler_cxx')

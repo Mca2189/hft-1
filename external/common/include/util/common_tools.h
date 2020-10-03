@@ -195,9 +195,9 @@ std::tuple<double, double> CalMeanStd(const T & v, int head, int num) {
 
 double RoundPrice(double price, double min_price, int size = 1);
 
-static void RunDataProxy();
-static void RunOrderProxy();
-static void RunExchangeinfoProxy();
+void RunDataProxy();
+void RunOrderProxy();
+void RunExchangeinfoProxy();
 std::vector<std::thread*> run_proxy();
 
 template <template<typename> class T1, typename T2>
