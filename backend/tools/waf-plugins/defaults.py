@@ -9,10 +9,12 @@ def options(opt):
     choices = [ 'debug', 'release' ],
     dest    = 'debug_level')
 
-  opt.load('compiler_cxx unittest_gtest lint')
+  #opt.load('compiler_cxx unittest_gtest lint')
+  opt.load('compiler_cxx lint')# unittest_gtest lint')
 
 def configure(conf):
-  conf.load('compiler_cxx local_rpath unittest_gtest lint')
+  #conf.load('compiler_cxx local_rpath unittest_gtest lint')
+  conf.load('compiler_cxx local_rpath lint')
 
   conf.env.CXXFLAGS         = [
     '-Werror',

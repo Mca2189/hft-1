@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <zmq.hpp>
 #include <ThostFtdcTraderApi.h>
 #include <unordered_map>
 
@@ -8,6 +7,7 @@
 #include <vector>
 #include <memory>
 
+#include <zmq.hpp>
 #include "util/dater.h"
 #include "util/contract_worker.h"
 #include "util/zmq_recver.hpp"
@@ -38,7 +38,7 @@ std::unordered_map<std::string, std::string> RegisterExchange() {
 
 void* RunOrderCommandListener(void *param) {
   MessageSender* message_sender = reinterpret_cast<MessageSender*>(param);
-  auto r = new ZmqRecver<Order>("order_recver");
+  auto r = new ZmqRecver<Order>("external_order");
   std::shared_ptr<ZmqSender<Order> > sender(new ZmqSender<Order>("*:33335", "bind", "tcp"));
   while (true) {
     Order o;
@@ -68,9 +68,12 @@ int main() {
   CThostFtdcTraderApi* user_api = CThostFtdcTraderApi::CreateFtdcTraderApi();
 
   std::string broker = "9999";
+  std::string username = "115686";
+  std::string password = "fz567789";
+  /*
+  std::string broker = "9999";
   std::string username = "116909";
   std::string password = "yifeng";
-  /*
   std::string broker = "1025";
   std::string username = "920207";
   std::string password = "584hxy..";
@@ -80,9 +83,6 @@ int main() {
   std::string broker = "1025";
   std::string username = "920207";
   std::string password = "584hxy..";
-  std::string broker = "9999";
-  std::string username = "115686";
-  std::string password = "fz567789";
   */
   ::unordered_map<int, int> order_id_map;
 
@@ -100,7 +100,7 @@ int main() {
   std::string default_path = GetDefaultPath();
   std::string contract_config_path = default_path + "/hft/config/contract/bk_contract.config";
   ContractWorker cw(contract_config_path);
-  Listener listener("exchange_info",
+  Listener listener("external_exchangeinfo",
                     &message_sender,
                     "error_list",
                     &order_id_map,

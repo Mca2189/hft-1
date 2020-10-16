@@ -339,8 +339,7 @@ void Strategy::CloseLogic() {
   }
 
   if (HitMean()) {
-    if (Close()) {
-    }
+    Close();
     return;
   }
 }
@@ -530,7 +529,7 @@ bool Strategy::Ready() {
 void Strategy::ModerateOrders(const std::string & ticker) {
   // just make sure the order filled
   if (m_mode == StrategyMode::Real) {
-    for (auto m:m_order_map) {
+    for (auto m : m_order_map) {
       Order* o = m.second;
       if (o->Valid()) {
         std::string ticker = o->ticker;

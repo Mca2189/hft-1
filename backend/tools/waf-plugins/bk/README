@@ -1,5 +1,0 @@
-local_rpath:
-wget http://waf.googlecode.com/git-history/8dc822fded66db8041a0b71f3c7e451f6d07aa43/waflib/extras/local_rpath.py
-
-unittest_gtest:
-wget http://github.com/tanakh/waf-unittest/raw/master/unittest_gtest.py

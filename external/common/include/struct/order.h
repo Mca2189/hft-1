@@ -16,8 +16,8 @@
 #include <fstream>
 
 struct Order {
-  timeval shot_time;
-  timeval send_time;
+  timeval shot_time = {1000000000, 100000};
+  timeval send_time = {1000000000, 100000};
   char ticker[MAX_CONTRACT_LENGTH];
   double price;
   int32_t size;
@@ -40,10 +40,10 @@ struct Order {
       offset(Offset::UNINITED),
       target_price(0.0),
       shot_latency(0.0) {
-    snprintf(ticker, sizeof(ticker), "%s", "");
-    snprintf(order_ref, sizeof(order_ref), "%s", "");
-    snprintf(tbd, sizeof(tbd), "%s", "");
-    snprintf(exchange, sizeof(exchange), "%s", "");
+    snprintf(ticker, sizeof(ticker), "%s", "none");
+    snprintf(order_ref, sizeof(order_ref), "%s", "none");
+    snprintf(tbd, sizeof(tbd), "%s", "none");
+    snprintf(exchange, sizeof(exchange), "%s", "none");
   }
 
   bool Valid() const {

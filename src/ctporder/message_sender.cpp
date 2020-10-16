@@ -29,12 +29,12 @@ void MessageSender::Auth() {
 
   CThostFtdcReqAuthenticateField reqauth;
   memset(&reqauth, 0, sizeof(reqauth));
-  strncpy(reqauth.BrokerID, broker_id_.c_str(), sizeof(reqauth.BrokerID));
-  strncpy(reqauth.UserID, user_id_.c_str(), sizeof(reqauth.UserID));
-  strncpy(reqauth.AppID, "client_hft_168", sizeof(reqauth.AppID));
-  strncpy(reqauth.AuthCode, "9DEYFJ0E8189C29C", sizeof(reqauth.AuthCode));
-  // strncpy(reqauth.AppID, "client_9030001896_v1", sizeof(reqauth.AppID));
-  // strncpy(reqauth.AuthCode, "AQ1963JWQ6ATP9FE", sizeof(reqauth.AuthCode));
+  snprintf(reqauth.BrokerID, sizeof(reqauth.BrokerID), "%s", broker_id_.c_str());
+  snprintf(reqauth.UserID, sizeof(reqauth.UserID), "%s", user_id_.c_str());
+  snprintf(reqauth.AppID, sizeof(reqauth.AppID), "%s", "client_hft_168");
+  snprintf(reqauth.AuthCode, sizeof(reqauth.AuthCode), "%s", "9DEYFJ0E8189C29C");
+  // snprintf(reqauth.AppID, sizeof(reqauth.AppID), "%s", "client_9030001896_v1");
+  // snprintf(reqauth.AuthCode, sizeof(reqauth.AuthCode), "%s", "AQ1963JWQ6ATP9FE");
 
   printf("Get Auth...\n");
   int result = user_api_->ReqAuthenticate(&reqauth, ++request_id_);
@@ -49,9 +49,9 @@ void MessageSender::SendLogin() {
   CThostFtdcReqUserLoginField request;
   memset(&request, 0, sizeof(request));
 
-  strncpy(request.BrokerID, broker_id_.c_str(), sizeof(request.BrokerID));
-  strncpy(request.UserID, user_id_.c_str(), sizeof(request.UserID));
-  strncpy(request.Password, password_.c_str(), sizeof(request.Password));
+  snprintf(request.BrokerID, sizeof(request.BrokerID), "%s", broker_id_.c_str());
+  snprintf(request.UserID, sizeof(request.UserID), "%s", user_id_.c_str());
+  snprintf(request.Password, sizeof(request.Password), "%s", password_.c_str());
 
   printf("Logging in as %s\n", user_id_.c_str());
 
@@ -67,8 +67,8 @@ void MessageSender::SendSettlementInfoConfirm() {
   CThostFtdcSettlementInfoConfirmField req;
   memset(&req, 0, sizeof(req));
 
-  strncpy(req.BrokerID, broker_id_.c_str(), sizeof(req.BrokerID));
-  strncpy(req.InvestorID, user_id_.c_str(), sizeof(req.InvestorID));
+  snprintf(req.BrokerID, sizeof(req.BrokerID), "%s", broker_id_.c_str());
+  snprintf(req.InvestorID, sizeof(req.InvestorID), "%s", user_id_.c_str());
 
   int result = user_api_->ReqSettlementInfoConfirm(&req, ++request_id_);
   if (result != 0) {
@@ -82,8 +82,8 @@ void MessageSender::SendQueryTradingAccount() {
   CThostFtdcQryTradingAccountField trading_account;
   memset(&trading_account, 0, sizeof(trading_account));
 
-  strncpy(trading_account.BrokerID, broker_id_.c_str(), sizeof(trading_account.BrokerID));
-  strncpy(trading_account.InvestorID, user_id_.c_str(), sizeof(trading_account.InvestorID));
+  snprintf(trading_account.BrokerID, sizeof(trading_account.BrokerID), "%s", broker_id_.c_str());
+  snprintf(trading_account.InvestorID, sizeof(trading_account.InvestorID), "%s", user_id_.c_str());
 
   int result = user_api_->ReqQryTradingAccount(&trading_account, ++request_id_);
   if (result != 0) {
@@ -146,10 +146,10 @@ bool MessageSender::NewOrder(const Order& order) {
   CThostFtdcInputOrderField req;
   memset(&req, 0, sizeof(req));
 
-  strncpy(req.BrokerID, broker_id_.c_str(), sizeof(req.BrokerID));
-  strncpy(req.InvestorID, user_id_.c_str(), sizeof(req.InvestorID));
+  snprintf(req.BrokerID, sizeof(req.BrokerID), "%s", broker_id_.c_str());
+  snprintf(req.InvestorID, sizeof(req.InvestorID), "%s", user_id_.c_str());
 
-  strncpy(req.InstrumentID, order.ticker, sizeof(req.InstrumentID));
+  snprintf(req.InstrumentID, sizeof(order.ticker), "%s", order.ticker);
   std::string con = GetCon(order.ticker);
   if (exchange_map.find(con) == exchange_map.end()) {
     printf("%s %s not found exchange", con.c_str(), order.ticker);
@@ -157,7 +157,7 @@ bool MessageSender::NewOrder(const Order& order) {
     return false;
   }
 
-  strncpy(req.ExchangeID, exchange_map[con].c_str(), sizeof(req.InstrumentID));
+  snprintf(req.ExchangeID, sizeof(req.InstrumentID), "%s", exchange_map[con].c_str());
   printf("order %s exchangeid is %s\n", order.order_ref, exchange_map[con].c_str());
 
   snprintf(req.OrderRef, sizeof(req.OrderRef), "%d", t_m->GetCtpId(order));
@@ -259,12 +259,12 @@ void MessageSender::CancelOrder(const Order& order) {
   int ctp_order_ref = t_m->GetCtpId(order);
   Order o = t_m->GetOrder(ctp_order_ref);
 
-  strncpy(req.BrokerID, broker_id_.c_str(), sizeof(req.BrokerID));
-  strncpy(req.InvestorID, user_id_.c_str(), sizeof(req.InvestorID));
-  // strncpy(req.OrderRef, exchange_id.c_str(), sizeof(req.OrderRef));
+  snprintf(req.BrokerID, sizeof(req.BrokerID), "%s", broker_id_.c_str());
+  snprintf(req.InvestorID, sizeof(req.InvestorID), "%s", user_id_.c_str());
+  // snprintf(req.OrderRef, sizeof(req.OrderRef), "%s", exchange_id.c_str());
   snprintf(req.OrderRef, sizeof(req.OrderRef), "%d", ctp_order_ref);
 
-  strncpy(req.InstrumentID, o.ticker, sizeof(req.InstrumentID));
+  snprintf(req.InstrumentID, sizeof(o.ticker), "%s", o.ticker);
 
   std::string con = GetCon(order.ticker);
   if (exchange_map.find(con) == exchange_map.end()) {
@@ -273,7 +273,7 @@ void MessageSender::CancelOrder(const Order& order) {
     return;
   }
 
-  strncpy(req.ExchangeID, exchange_map[con].c_str(), sizeof(req.InstrumentID));
+  snprintf(req.ExchangeID, sizeof(req.InstrumentID), "%s", exchange_map[con].c_str());
   printf("cancel order %s exchangeid is %s\n", order.order_ref, exchange_map[con].c_str());
 
   req.FrontID = front_id_;

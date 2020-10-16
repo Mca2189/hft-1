@@ -18,11 +18,12 @@ using namespace std;
 template<template<typename> class T>
 class StrategyContainer {
  public:
-  StrategyContainer(unordered_map<string, vector<BaseStrategy*> > &m)
+  StrategyContainer(unordered_map<string, vector<BaseStrategy*> > &m, bool debug_mode = false)
     : m(m),
-      marketdata_recver(new T<MarketSnapshot>("data_recver")),
-      exchangeinfo_recver(new T<ExchangeInfo>("exchange_info")),
-      command_recver(new ZmqRecver<Command>("*:33334", "tcp", "bind")) {
+      debug_mode_(debug_mode),
+      marketdata_recver(CreateRecver<T, MarketSnapshot>("data")),
+      exchangeinfo_recver(CreateRecver<T, ExchangeInfo>("strategy_exchangeinfo")),
+      command_recver(CreateRecver<T, Command>("command")) {
 
 }
   // explicit StrategyContainer(const StrategyContainer& sc) {}  // unable copy constructor
@@ -30,15 +31,26 @@ class StrategyContainer {
   virtual ~StrategyContainer() {
   }
   void Start() {
+    auto v = run_proxy();
+    // thread data_proxy_thread(RunDataProxy);
+    // thread order_proxy_thread(RunOrderProxy);
+    // thread exchangeinfo_proxy_thread(RunExchangeinfoProxy);
     thread command_thread(RunCommandListener, std::ref(m), command_recver.get());
     thread exchangeinfo_thread(RunExchangeListener, std::ref(m), exchangeinfo_recver.get());
-    thread marketdata_thread(RunMarketDataListener, std::ref(m), marketdata_recver.get());
+    // data_proxy_thread.join();
+    // order_proxy_thread.join();
+    // exchangeinfo_proxy_thread.join();
+    thread marketdata_thread(RunMarketDataListener, std::ref(m), marketdata_recver.get(), debug_mode_);
+    for (auto i : v) {
+      i->join();
+    }
     command_thread.join();
     exchangeinfo_thread.join();
     marketdata_thread.join();
   }
+
  private:
-  static void RunCommandListener(unordered_map<string, vector<BaseStrategy*> > &m, ZmqRecver<Command>* command_recver) {
+  static void RunCommandListener(unordered_map<string, vector<BaseStrategy*> > &m, BaseRecver<Command>* command_recver) {
     while (true) {
       Command shot;
       command_recver->Recv(shot);
@@ -56,7 +68,7 @@ class StrategyContainer {
     }
   }
 
-  static void RunExchangeListener(unordered_map<string, vector<BaseStrategy*> > &m, T<ExchangeInfo>* exchangeinfo_recver) {
+  static void RunExchangeListener(unordered_map<string, vector<BaseStrategy*> > &m, BaseRecver<ExchangeInfo>* exchangeinfo_recver) {
     while (true) {
       ExchangeInfo info;
       exchangeinfo_recver->Recv(info);
@@ -68,11 +80,15 @@ class StrategyContainer {
     }
   }
 
-  static void RunMarketDataListener(unordered_map<string, vector<BaseStrategy*> > &m, T<MarketSnapshot> * marketdata_recver) {
+  static void RunMarketDataListener(unordered_map<string, vector<BaseStrategy*> > &m, BaseRecver<MarketSnapshot> * marketdata_recver, bool debug_mode) {
+    int count = 0;
     while (true) {
       MarketSnapshot shot;
       marketdata_recver->Recv(shot);
       auto sv = m[shot.ticker];
+      if (debug_mode && count++ < 1000) {
+        shot.Show(stdout);
+      }
       for (auto s : sv) {
         s->UpdateData(shot);
       }
@@ -80,9 +96,10 @@ class StrategyContainer {
   }
 
   unordered_map<string, vector<BaseStrategy*> > &m;
-  unique_ptr<T<MarketSnapshot> > marketdata_recver;
-  unique_ptr<T<ExchangeInfo> > exchangeinfo_recver;
-  unique_ptr<ZmqRecver<Command> > command_recver;
+  bool debug_mode_;
+  unique_ptr<BaseRecver<MarketSnapshot> > marketdata_recver;
+  unique_ptr<BaseRecver<ExchangeInfo> > exchangeinfo_recver;
+  unique_ptr<BaseRecver<Command> > command_recver;
 };
 
 #endif  // STRATEGY_CONTAINER_HPP_

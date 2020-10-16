@@ -12,7 +12,8 @@ def options(opt):
   opt.load('compiler_cxx')
 
 def configure(conf):
-  Copy()
+  from waflib import Task, Context
+  Install()
   conf.load('defaults')
   conf.load('compiler_c')
   conf.load('compiler_cxx')
@@ -28,6 +29,8 @@ def configure(conf):
 from waflib.Build import BuildContext
 class all_class(BuildContext):
   cmd = "all"
+class strategy_class(BuildContext):
+  cmd = "strategy"
 class pricer_class(BuildContext):
   cmd = "pricer"
 class proxy_class(BuildContext):
@@ -48,8 +51,12 @@ class simplearb_class(BuildContext):
   cmd = "simplearb"
 class simplearb2_class(BuildContext):
   cmd = "simplearb2"
+class coinarb_class(BuildContext):
+  cmd = "coinarb"
 class pairtrading_class(BuildContext):
   cmd = "pairtrading"
+class demostrat_class(BuildContext):
+  cmd = "demostrat"
 class backtest_class(BuildContext):
   cmd = "backtest"
 class backtest2_class(BuildContext):
@@ -58,10 +65,20 @@ class backtestpr_class(BuildContext):
   cmd = "backtestpr"
 class order_matcher_class(BuildContext):
   cmd = "order_matcher"
-class demostrat_class(BuildContext):
-  cmd = "demostrat"
 class simdata_class(BuildContext):
   cmd = "simdata"
+class lib_simplemaker_class(BuildContext):
+  cmd = "lib_simplemaker"
+class lib_simplearb_class(BuildContext):
+  cmd = "lib_simplearb"
+class lib_simplearb2_class(BuildContext):
+  cmd = "lib_simplearb2"
+class lib_coinarb_class(BuildContext):
+  cmd = "lib_coinarb"
+class lib_pairtrading_class(BuildContext):
+  cmd = "lib_pairtrading"
+class lib_demostrat_class(BuildContext):
+  cmd = "lib_demostrat"
 from lint import add_lint_ignore
 
 def build(bld):
@@ -69,6 +86,9 @@ def build(bld):
   add_lint_ignore('backend')
   if bld.cmd == "all":
     run_all(bld)
+    return
+  if bld.cmd == "strategy":
+    run_strategy(bld)
     return
   if bld.cmd == "pricer":
     run_pricer(bld)
@@ -100,8 +120,14 @@ def build(bld):
   if bld.cmd == "simplearb2":
     run_simplearb2(bld)
     return
+  if bld.cmd == "coinarb":
+    run_coinarb(bld)
+    return
   if bld.cmd == "pairtrading":
     run_pairtrading(bld)
+    return
+  if bld.cmd == "demostrat":
+    run_demostrat(bld)
     return
   if bld.cmd == "backtest":
     run_backtest(bld)
@@ -115,14 +141,29 @@ def build(bld):
   if bld.cmd == "order_matcher":
     run_order_matcher(bld)
     return
-  if bld.cmd == "demostrat":
-    run_demostrat(bld)
-    return
   if bld.cmd == "simdata":
     run_simdata(bld)
     return
+  if bld.cmd == "lib_simplemaker":
+    run_lib_simplemaker(bld)
+    return
+  if bld.cmd == "lib_simplearb":
+    run_lib_simplearb(bld)
+    return
+  if bld.cmd == "lib_simplearb2":
+    run_lib_simplearb2(bld)
+    return
+  if bld.cmd == "lib_coinarb":
+    run_lib_coinarb(bld)
+    return
+  if bld.cmd == "lib_pairtrading":
+    run_lib_pairtrading(bld)
+    return
+  if bld.cmd == "lib_demostrat":
+    run_lib_demostrat(bld)
+    return
   else:
-    print "error! " + str(bld.cmd)
+    print("error! ", str(bld.cmd))
     return
 
 def run_ctpdata(bld):
@@ -239,6 +280,21 @@ def run_simplearb2(bld):
     use = 'zmq nick pthread config++ shm' # simplearb'
   )
 
+def run_coinarb(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.shlib(target='coin', source='src/coinarb/strategy.cpp')
+  bld.program(
+    target = 'bin/coinarb',
+    source = ['src/coinarb/main.cpp',
+              'src/coinarb/strategy.cpp'
+             ],
+    includes = [
+                'external/zeromq/include'
+               ],
+    use = 'zmq nick pthread config++ shm c'
+  )
+
+
 def run_pairtrading(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
   bld.program(
@@ -310,20 +366,74 @@ def run_demostrat(bld):
     source = ['src/demostrat/main.cpp',
               'src/demostrat/strategy.cpp'],
     includes = ['external/zeromq/include'],
+    use = 'zmq nick pthread config++ z'
+  )
+
+def run_strategy(bld):
+  run_lib_simplearb(bld)
+  run_lib_simplearb2(bld)
+  run_lib_coinarb(bld)
+  run_lib_pairtrading(bld)
+  run_lib_demostrat(bld)
+  run_lib_simplemaker(bld)
+
+def run_lib_simplemaker(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.shlib(
+    target = './external/strategy/simplemaker',
+    source = ['strategy/simplemaker/simplemaker.cpp'],
+    includes = ['external/zeromq/include'],
     use = 'zmq nick pthread config++'
   )
 
-def run_demostrat(bld):
+def run_lib_simplearb(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
-  bld.program(
-    target = 'bin/demostrat',
-    source = ['src/demostrat/main.cpp',
-              'src/demostrat/strategy.cpp'],
+  bld.shlib(
+    target = '../external/strategy/simplearb',
+    source = ['strategy/simplearb/simplearb.cpp'],
+    includes = ['external/zeromq/include'],
+    use = 'zmq nick pthread config++ shm'
+  )
+
+def run_lib_simplearb2(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.shlib(
+    target = '../external/strategy/simplearb2',
+    source = ['strategy/simplearb2/simplearb2.cpp'],
+    includes = ['external/zeromq/include'],
+    use = 'zmq nick pthread config++ shm'
+  )
+
+def run_lib_coinarb(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.shlib(
+    target = '../external/strategy/coinarb',
+    source = ['strategy/coinarb/coinarb.cpp'],
+    includes = ['external/zeromq/include'],
+    use = 'zmq nick pthread config++ shm c'
+  )
+
+def run_lib_pairtrading(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.shlib(
+    target = '../external/strategy/pairtrading',
+    source = ['strategy/pairtrading/pairtrading.cpp'],
+    includes = ['external/zeromq/include'],
+    use = 'zmq nick pthread config++ shm'
+  )
+
+def run_lib_demostrat(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.shlib(
+    target = '../external/strategy/demostrat',
+    source = ['strategy/demostrat/demostrat.cpp'],
     includes = ['external/zeromq/include'],
     use = 'zmq nick pthread config++ z'
   )
 
 def run_all(bld):
+  if os.path.getsize('strategy') > 200:
+    run_strategy(bld)
   run_mid_data(bld)
   run_proxy(bld)
   run_ctpdata(bld)
@@ -332,10 +442,17 @@ def run_all(bld):
   run_getins(bld)
   run_simplearb(bld)
   run_simplearb2(bld)
+  run_simplemaker(bld)
+  run_demostrat(bld)
+  run_coinarb(bld)
   run_pairtrading(bld)
   run_backtest(bld)
   run_backtest2(bld)
   run_backtestpr(bld)
   run_order_matcher(bld)
-  run_demostrat(bld)
-  run_simplemaker(bld)
+  run_lib_simplearb(bld)
+  run_lib_simplearb2(bld)
+  run_lib_simplemaker(bld)
+  run_lib_demostrat(bld)
+  run_lib_coinarb(bld)
+  run_lib_pairtrading(bld)

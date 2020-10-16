@@ -1,15 +1,17 @@
 #ifndef SRC_BACKTEST_STRATEGY_H_
 #define SRC_BACKTEST_STRATEGY_H_
 
-#include <libconfig.h++>
 #include <unordered_map>
 
 #include <cmath>
+#include <tuple>
 #include <vector>
 #include <string>
 #include <iostream>
 #include <deque>
 #include <memory>
+
+#include <libconfig.h++>
 
 #include "struct/market_snapshot.h"
 #include "struct/strategy_status.h"

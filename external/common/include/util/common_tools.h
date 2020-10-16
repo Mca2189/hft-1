@@ -25,7 +25,16 @@
 #include <chrono>
 #include <thread>
 
+#include <zmq.hpp>
+
 #include "struct/market_snapshot.h"
+#include "util/base_recver.hpp"
+#include "util/base_sender.hpp"
+#include "util/zmq_recver.hpp"
+#include "util/zmq_sender.hpp"
+#include "util/shm_recver.hpp"
+#include "util/shm_sender.hpp"
+
 using namespace std;
 using namespace std::chrono;
 
@@ -185,5 +194,46 @@ std::tuple<double, double> CalMeanStd(const T & v, int head, int num) {
 }
 
 double RoundPrice(double price, double min_price, int size = 1);
+
+void RunDataProxy();
+void RunOrderProxy();
+void RunExchangeinfoProxy();
+std::vector<std::thread*> run_proxy();
+
+template <template<typename> class T1, typename T2>
+std::unique_ptr<BaseSender<T2> > CreateSender(const std::string& mode) {
+  if (mode == "order") {
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("strategy_order", "connect", "ipc", "order.dat"));
+  } else if (mode == "data") {
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("external_data", "connect", "ipc"));
+  } else if (mode == "exchangeinfo") {
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("external_exchangeinfo", "connect", "ipc", "exchange.dat"));
+  } else if (mode == "ui") {
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("*:33333", "bind", "tcp", "mid.dat"));
+  } else if (mode == "command") {
+    return std::unique_ptr<BaseSender<T2> >(new T1<T2>("*:33335", "bind", "tcp"));
+  } else {
+    printf("sender unknown mode!%s\n", mode.c_str());
+  }
+  return nullptr;
+}
+
+template <template<typename> class T1, typename T2>
+std::unique_ptr<BaseRecver<T2> > CreateRecver(const std::string& mode) {
+  if (mode == "order") {
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("external_order"));
+  } else if (mode == "data") {
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("strategy_data"));
+  } else if (mode == "exchangeinfo") {
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("strategy_exchangeinfo"));
+  } else if (mode == "command") {
+    return std::unique_ptr<BaseRecver<T2> >(new T1<T2>("*:33334", "tcp", "bind"));
+  } else {
+    printf("recver unknown mode!%s\n", mode.c_str());
+  }
+  return nullptr;
+}
+
+bool FileExists(const std::string& file_path);
 
 #endif // COMMON_TOOLS_H_

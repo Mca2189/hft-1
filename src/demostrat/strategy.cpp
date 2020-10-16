@@ -5,10 +5,11 @@
 #include "demostrat/strategy.h"
 
 Strategy::Strategy(std::unordered_map<std::string, std::vector<BaseStrategy*> >*ticker_strat_map, ZmqSender<Order>* ordersender, TimeController* tc) {
+  m_strat_name = "coin";
   m_order_sender = ordersender;
   m_tc = tc;
-  main_ticker = "T2009";
-  hedge_ticker = "T2012";
+  main_ticker = "ETH-USDT-SWAP";
+  hedge_ticker = "asd";
   (*ticker_strat_map)[main_ticker].emplace_back(this);
   (*ticker_strat_map)[hedge_ticker].emplace_back(this);
   (*ticker_strat_map)["positionend"].emplace_back(this);
@@ -35,7 +36,7 @@ void Strategy::DoOperationAfterCancelled(Order* o) {
 double Strategy::OrderPrice(const std::string & ticker, OrderSide::Enum side, bool control_price) {
   // this is a logic to make order use market price
   // return (side == OrderSide::Buy)?m_shot_map[ticker].asks[0]:m_shot_map[ticker].bids[0];
-  return (side == OrderSide::Buy)? 102500:104500;
+  return (side == OrderSide::Buy)? 350:1000;
 }
 
 void Strategy::Start() {
@@ -43,12 +44,12 @@ void Strategy::Start() {
   // start with two order
   // NewOrder(, OrderSide::Buy, 1, false, false);
   // NewOrder(main_ticker, OrderSide::Sell, 1000, false, false, "");
-  PlaceOrder("T2009", 99, 1, false, "test");
+  PlaceOrder(main_ticker, 392, 1, false, "test")->Show(stdout);
   // o->Show(stdout);
 }
 
 void Strategy::DoOperationAfterUpdateData(const MarketSnapshot& shot) {
-  shot.Show(stdout);
+  // shot.Show(stdout);
 }
 
 void Strategy::ModerateOrders(const std::string & ticker) {
@@ -57,9 +58,9 @@ void Strategy::ModerateOrders(const std::string & ticker) {
     MarketSnapshot shot = m_shot_map[o->ticker];
     if (o->Valid()) {
       if (o->side == OrderSide::Buy && fabs(o->price - shot.asks[0]) > 0.01) {
-        ModOrder(o);
+        // ModOrder(o);
       } else if (o->side == OrderSide::Sell && fabs(o->price - shot.bids[0]) > 0.01) {
-        ModOrder(o);
+        // ModOrder(o);
       } else {
       }
     }

@@ -2,13 +2,14 @@
 #define SRC_PAIRTRADING_STRATEGY_H_
 
 #include <unordered_map>
-#include <libconfig.h++>
 
 #include <cmath>
 #include <vector>
 #include <string>
 #include <iostream>
 #include <memory>
+
+#include <libconfig.h++>
 
 #include "util/time_controller.h"
 #include "util/zmq_sender.hpp"
