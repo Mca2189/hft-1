@@ -380,7 +380,7 @@ def run_strategy(bld):
 def run_lib_simplemaker(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
   bld.shlib(
-    target = './external/strategy/simplemaker',
+    target = '../external/strategy/simplemaker',
     source = ['strategy/simplemaker/simplemaker.cpp'],
     includes = ['external/zeromq/include'],
     use = 'zmq nick pthread config++'
