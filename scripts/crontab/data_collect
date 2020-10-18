@@ -1,9 +1,0 @@
-30 03 * * 2-6 /home/nick/future/rsync.sh
-40 15 * * 1-5 /home/nick/stock/rsync.sh
-12 00 * * * /home/nick/coin/rsync.sh
-12 00 * * * /home/nick/coin/rsync2.sh
-12 07 * * * /root/zip.sh
-30 06 * * * /root/hft/lib-hft/tools/dt/run.sh
-20 00 * * * /root/updatetime.sh
-
-05 05 1 9 * /root/hft/lib-hft/tools/dt/makeup.sh

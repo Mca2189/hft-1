@@ -14,7 +14,6 @@ def GetUserPath():
     sys.exit(1)
   return user_path
 
-
 def Copy():
   if not os.path.exists('./lib-hft'):
     print("%s not existed!"%('./lib-hft'))
@@ -41,14 +40,15 @@ def Copy():
     return
   shutil.copy("./lib-hft/make_dir/libnick.so", './external/common/lib')
 
-def Install():
-  if not os.path.exists('./lib-hft'):
-    print("%s not existed!"%('./lib-hft'))
+def Install(topic='lib-hft'):
+  if not os.path.exists(topic):
+    Redrint("%s not existed!"%(topic))
     return
-  if os.path.getsize('lib-hft') < 100:
-    print('lib-hft size is too small', os.path.getsize('lib-hft'))
+  if os.path.getsize(topic) < 100:
+    RedPrint(topic, 'size is too small', os.path.getsize(topic))
     return
-  os.system('cd lib-hft; cmake .; make install')
+  #os.system('cd %s; cmake .; make install' %(topic))
+  os.system('cd %s; install -d build; cd build; cmake ..; make install' %(topic))
 
 if __name__ == '__main__':
   Install()

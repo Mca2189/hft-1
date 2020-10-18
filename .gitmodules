@@ -4,3 +4,6 @@
 [submodule "strategy"]
 	path = strategy
 	url = git@github.com:nickhuangxinyu/strategy.git
+[submodule "deploy-hft"]
+	path = deploy-hft
+	url = git@github.com:nickhuangxinyu/deploy-hft.git

@@ -367,7 +367,7 @@ class Node(object):
 				pass
 
 			if not self.isdir():
-				raise Errors.WafError('Could not create the directory %r' % self)
+				raise Errors.WafError('Could not create the directory %r' % self + ' ' + self.abspath())
 
 			try:
 				self.children

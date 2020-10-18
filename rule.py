@@ -1,5 +1,5 @@
 import sys, os
-from copy_header import *
+from copy_header import Install
 
 from waflib.Tools.compiler_c import c_compiler
 from waflib.Tools.compiler_cxx import cxx_compiler
@@ -282,7 +282,6 @@ def run_simplearb2(bld):
 
 def run_coinarb(bld):
   bld.read_shlib('nick', paths=['external/common/lib'])
-  bld.shlib(target='coin', source='src/coinarb/strategy.cpp')
   bld.program(
     target = 'bin/coinarb',
     source = ['src/coinarb/main.cpp',
