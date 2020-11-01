@@ -44,7 +44,7 @@ class Listener : public CThostFtdcMdSpi {
     binary_file.open(file_name.c_str(), ios::app | ios::out | ios::binary);
   }
   ~Listener() {
-    if (record_file) {
+    if (record_file){
       fclose(data_file);
     }
     if (record_binary) {

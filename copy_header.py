@@ -2,6 +2,7 @@ import shutil
 import subprocess
 import sys
 import os
+from util import *
 
 def GetUserPath():
   user = os.getcwd().split('/')[1]
@@ -42,7 +43,7 @@ def Copy():
 
 def Install(topic='lib-hft'):
   if not os.path.exists(topic):
-    Redrint("%s not existed!"%(topic))
+    RedPrint("%s not existed!"%(topic))
     return
   if os.path.getsize(topic) < 100:
     RedPrint(topic, 'size is too small', os.path.getsize(topic))
