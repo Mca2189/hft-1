@@ -22,9 +22,9 @@ def configure(conf):
   conf.env.CXXFLAGS += [ '-g', '-ldl', '-std=c++11']
   conf.check(lib='pthread', uselib_store='pthread')
   conf.check(lib='config++', uselib_store='config++')
-  conf.check(lib='python2.7', uselib_store='python2.7')
+  #conf.check(lib='python2.7', uselib_store='python2.7')
   conf.check(lib='zmq', uselib_store='zmq')
-  conf.check(lib='z', uselib_store='z')
+  #conf.check(lib='z', uselib_store='z')
 
 from waflib.Build import BuildContext
 class all_class(BuildContext):
@@ -319,7 +319,7 @@ def run_backtest(bld):
                 #'external/strategy/backtest/include',
                 'external/zeromq/include'
                 ],
-    use = 'zmq nick pthread config++ python2.7 z'
+    use = 'zmq nick pthread config++ z' #python2.7 z'
   )
 
 def run_backtest2(bld):
@@ -332,7 +332,7 @@ def run_backtest2(bld):
     includes = [
                 'external/zeromq/include'
                 ],
-    use = 'zmq nick pthread config++ python2.7 z'
+    use = 'zmq nick pthread config++ z' #python2.7 z'
   )
 
 def run_backtestpr(bld):
@@ -345,7 +345,7 @@ def run_backtestpr(bld):
     includes = [
                 'external/zeromq/include'
                 ],
-    use = 'zmq nick pthread config++ python2.7 z'
+    use = 'zmq nick pthread config++ z' #python2.7 z'
   )
 
 def run_order_matcher(bld):
@@ -445,13 +445,7 @@ def run_all(bld):
   run_demostrat(bld)
   run_coinarb(bld)
   run_pairtrading(bld)
-  run_backtest(bld)
-  run_backtest2(bld)
-  run_backtestpr(bld)
+  #run_backtest(bld)
+  #run_backtest2(bld)
+  #run_backtestpr(bld)
   run_order_matcher(bld)
-  run_lib_simplearb(bld)
-  run_lib_simplearb2(bld)
-  run_lib_simplemaker(bld)
-  run_lib_demostrat(bld)
-  run_lib_coinarb(bld)
-  run_lib_pairtrading(bld)
