@@ -49,6 +49,8 @@ class simplemaker_class(BuildContext):
   cmd = "simplemaker"
 class simplearb_class(BuildContext):
   cmd = "simplearb"
+class mainarb_class(BuildContext):
+  cmd = "mainarb"
 class simplearb2_class(BuildContext):
   cmd = "simplearb2"
 class coinarb_class(BuildContext):
@@ -116,6 +118,9 @@ def build(bld):
     return
   if bld.cmd == "simplearb":
     run_simplearb(bld)
+    return
+  if bld.cmd == "mainarb":
+    run_mainarb(bld)
     return
   if bld.cmd == "simplearb2":
     run_simplearb2(bld)
@@ -262,6 +267,19 @@ def run_simplearb(bld):
                 'external/zeromq/include'
                ],
     use = 'zmq nick pthread config++ shm' # simplearb'
+  )
+
+def run_mainarb(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.program(
+    target = 'bin/mainarb',
+    source = ['src/mainarb/main.cpp',
+              'src/mainarb/strategy.cpp'
+             ],
+    includes = [
+                'external/zeromq/include'
+               ],
+    use = 'zmq nick pthread config++ shm'
   )
 
 def run_simplearb2(bld):
@@ -440,6 +458,7 @@ def run_all(bld):
   run_manual_ctp(bld)
   run_getins(bld)
   run_simplearb(bld)
+  run_mainarb(bld)
   run_simplearb2(bld)
   run_simplemaker(bld)
   run_demostrat(bld)
