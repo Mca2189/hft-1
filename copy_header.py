@@ -3,17 +3,6 @@ import subprocess
 import sys
 import os
 
-def GetUserPath():
-  user = os.getcwd().split('/')[1]
-  if user == 'root':
-    user_path = '/root/'
-  elif user == 'home':
-    user_path = '/home/' + os.getcwd().split('/')[2] + '/'
-  else:
-    print('unknown user!%s' %(os.getcwd()))
-    sys.exit(1)
-  return user_path
-
 def Copy():
   if not os.path.exists('./lib-hft'):
     print("%s not existed!"%('./lib-hft'))
@@ -42,10 +31,10 @@ def Copy():
 
 def Install(topic='lib-hft'):
   if not os.path.exists(topic):
-    Redrint("%s not existed!"%(topic))
+    print("%s not existed!"%(topic))
     return
   if os.path.getsize(topic) < 100:
-    RedPrint(topic, 'size is too small', os.path.getsize(topic))
+    print(topic, 'size is too small', os.path.getsize(topic))
     return
   #os.system('cd %s; cmake .; make install' %(topic))
   os.system('cd %s; install -d build; cd build; cmake ..; make install' %(topic))

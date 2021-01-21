@@ -20,16 +20,16 @@ class ShmSender: public ShmWorker, public BaseSender<T> {
   }
 
   void Send(const T& shot) override {
-    pthread_mutex_lock(mutex);
+    // pthread_mutex_lock(mutex);
     auto tail = (atomic_int*)(m_data + 2*sizeof(atomic_int));
     memcpy(m_data+header_size+(tail->load()%m_size)*sizeof(T), &shot, sizeof(T));
     tail->fetch_add(1);
-    pthread_mutex_unlock(mutex);
-    if (f.get()) {
+    // pthread_mutex_unlock(mutex);
+    /*if (f.get()) {
       std::lock_guard<std::mutex> lck(mtx);  // for mutli-thread backtest file writting
       f.get()->write((char*)&shot, sizeof(T));
       f.get()->flush();
-    }
+    }*/
   }
  private:
   pthread_mutex_t* mutex;

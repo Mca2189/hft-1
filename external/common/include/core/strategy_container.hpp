@@ -22,10 +22,9 @@ class StrategyContainer {
     : m(m),
       debug_mode_(debug_mode),
       marketdata_recver(CreateRecver<T, MarketSnapshot>("data")),
-      exchangeinfo_recver(CreateRecver<T, ExchangeInfo>("strategy_exchangeinfo")),
+      exchangeinfo_recver(CreateRecver<T, ExchangeInfo>("exchangeinfo")),
       command_recver(CreateRecver<T, Command>("command")) {
-
-}
+  }
   // explicit StrategyContainer(const StrategyContainer& sc) {}  // unable copy constructor
   // explicit StrategyContainer(StrategyContainer && sc) {}  // unable move constructor
   virtual ~StrategyContainer() {

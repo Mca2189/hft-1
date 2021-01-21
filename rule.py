@@ -22,9 +22,9 @@ def configure(conf):
   conf.env.CXXFLAGS += [ '-g', '-ldl', '-std=c++11']
   conf.check(lib='pthread', uselib_store='pthread')
   conf.check(lib='config++', uselib_store='config++')
-  conf.check(lib='python2.7', uselib_store='python2.7')
+  #conf.check(lib='python2.7', uselib_store='python2.7')
   conf.check(lib='zmq', uselib_store='zmq')
-  conf.check(lib='z', uselib_store='z')
+  #conf.check(lib='z', uselib_store='z')
 
 from waflib.Build import BuildContext
 class all_class(BuildContext):
@@ -49,6 +49,8 @@ class simplemaker_class(BuildContext):
   cmd = "simplemaker"
 class simplearb_class(BuildContext):
   cmd = "simplearb"
+class mainarb_class(BuildContext):
+  cmd = "mainarb"
 class simplearb2_class(BuildContext):
   cmd = "simplearb2"
 class coinarb_class(BuildContext):
@@ -116,6 +118,9 @@ def build(bld):
     return
   if bld.cmd == "simplearb":
     run_simplearb(bld)
+    return
+  if bld.cmd == "mainarb":
+    run_mainarb(bld)
     return
   if bld.cmd == "simplearb2":
     run_simplearb2(bld)
@@ -264,6 +269,19 @@ def run_simplearb(bld):
     use = 'zmq nick pthread config++ shm' # simplearb'
   )
 
+def run_mainarb(bld):
+  bld.read_shlib('nick', paths=['external/common/lib'])
+  bld.program(
+    target = 'bin/mainarb',
+    source = ['src/mainarb/main.cpp',
+              'src/mainarb/strategy.cpp'
+             ],
+    includes = [
+                'external/zeromq/include'
+               ],
+    use = 'zmq nick pthread config++ shm'
+  )
+
 def run_simplearb2(bld):
   #bld.read_shlib('nick', paths=['external/common/lib'])
   bld.read_shlib('nick', paths=['external/common/lib'])
@@ -319,7 +337,7 @@ def run_backtest(bld):
                 #'external/strategy/backtest/include',
                 'external/zeromq/include'
                 ],
-    use = 'zmq nick pthread config++ python2.7 z'
+    use = 'zmq nick pthread config++ z' #python2.7 z'
   )
 
 def run_backtest2(bld):
@@ -332,7 +350,7 @@ def run_backtest2(bld):
     includes = [
                 'external/zeromq/include'
                 ],
-    use = 'zmq nick pthread config++ python2.7 z'
+    use = 'zmq nick pthread config++ z' #python2.7 z'
   )
 
 def run_backtestpr(bld):
@@ -345,7 +363,7 @@ def run_backtestpr(bld):
     includes = [
                 'external/zeromq/include'
                 ],
-    use = 'zmq nick pthread config++ python2.7 z'
+    use = 'zmq nick pthread config++ z' #python2.7 z'
   )
 
 def run_order_matcher(bld):
@@ -440,18 +458,13 @@ def run_all(bld):
   run_manual_ctp(bld)
   run_getins(bld)
   run_simplearb(bld)
+  run_mainarb(bld)
   run_simplearb2(bld)
   run_simplemaker(bld)
   run_demostrat(bld)
   run_coinarb(bld)
   run_pairtrading(bld)
-  run_backtest(bld)
-  run_backtest2(bld)
-  run_backtestpr(bld)
+  #run_backtest(bld)
+  #run_backtest2(bld)
+  #run_backtestpr(bld)
   run_order_matcher(bld)
-  run_lib_simplearb(bld)
-  run_lib_simplearb2(bld)
-  run_lib_simplemaker(bld)
-  run_lib_demostrat(bld)
-  run_lib_coinarb(bld)
-  run_lib_pairtrading(bld)

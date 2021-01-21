@@ -2,7 +2,7 @@
 #define BASE_STRATEGY_H_
 
 #include "util/base_sender.hpp"
-#include "util/base_sender.hpp"
+#include "util/base_recver.hpp"
 #include "util/dater.h"
 #include "util/common_tools.h"
 #include "util/time_controller.h"

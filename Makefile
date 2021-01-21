@@ -33,6 +33,9 @@ simplemaker:
 simplearb:
 	$(WAF) configure simplearb $(PARAMS)
 
+mainarb:
+	$(WAF) configure mainarb $(PARAMS)
+
 simplearb2:
 	$(WAF) configure simplearb2 $(PARAMS)
 
