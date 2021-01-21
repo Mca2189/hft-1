@@ -199,13 +199,12 @@ class Listener : public CThostFtdcMdSpi {
       }
       sleep(1);
     } else {
-      char a[65536][64];
-      char * g_pInstrumentID[65536];
+      char buffer[120000][32];
+      char *g_pInstrumentID[120000];
       int count = 0;
-      while (!file.eof()) {
-        file.getline(a[count], 64);
-        g_pInstrumentID[count] = a[count];
-        count++;
+      while (file.getline(buffer[count], sizeof(buffer[count]))) {
+        g_pInstrumentID[count] = buffer[count];
+        ++count;
       }
       printf("sending %s\n", g_pInstrumentID[0]);
       int result = user_api_->SubscribeMarketData(g_pInstrumentID, count);
