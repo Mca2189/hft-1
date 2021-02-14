@@ -146,7 +146,7 @@ class Listener : public CThostFtdcMdSpi {
       snapshot.bids[i] = 0;
       snapshot.asks[i] = 0;
     }
-    snapshot.Show(stdout, 5);
+    // snapshot.Show(stdout, 5);
     sender->Send(snapshot);
     if (record_file) {
       snapshot.Show(data_file, 5);
