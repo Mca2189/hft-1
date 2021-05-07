@@ -23,7 +23,7 @@
 * How to run it
   As a start, you can run ctpdata (after 'make', ./build/bin/ctpdata), if network is good, and time is in the trading session(9:00-11:30 13:30-3:00), you can see marketdata come out in your screen.
 * ui
-you can find the frontend ui: https://github.com/nickhuangxinyu/Gallery/blob/master/TradingMonitor.rar
+you can find the frontend ui: https://github.com/nickhuangxinyu/Gallery/blob/master/TradingMonitor.rar (### deprecated ###)
 you can open it in trading time, it's a monitor of spread.
 
 
