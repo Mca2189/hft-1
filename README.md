@@ -2,7 +2,6 @@
 # High Frequency Trading Solution #
 * running on china futures market and cryptocurrency market
 
-## This system is not perfect, there are many things can be improved, if you want to cooperate with me to build a better one, please contact with me. 17210240111@fudan.edu.cn
 
 ### What is this repository for? ###
 * automatic algorithm trading system
