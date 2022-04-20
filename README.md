@@ -1,3 +1,5 @@
+# This Repo is a school project, updates stopped. I have a more flexible and easy-to-use machine-learning framework. Contract me if you have interest to cooperate on feature-based intra-day trading strategies. huangxy17@fudan.edu.cn
+
 ![pnl](https://github.com/nickhuangxinyu/hft/blob/master/pnl.png "pnl running on china futures market")
 # High Frequency Trading Solution #
 * running on china futures market and cryptocurrency market
